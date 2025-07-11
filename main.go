@@ -1,77 +1,102 @@
+package main
+
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 
+	"utils/index"
+
+	"github.com/fatih/color"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
-var version string
-
 func main() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+	var version string
+
+	file, err := os.Open("./package.json")
+	if err != nil {
+		fmt.Println("Error reading package.json:", err)
+		return
 	}
-}
+	defer file.Close()
 
-func init() {
-	// 添加版本信息
-	rootCmd.Flags().BoolP("version", "v", false, "Output the current version")
-	rootCmd.Version(version)
+	bytes, _ := ioutil.ReadAll(file)
+	json.Unmarshal(bytes, &version) // Assuming version is a string in package.json
 
-	// 添加子命令
-	addCommands()
-}
+	var rootCmd = &cobra.Command{
+		Use:   "tmail",
+		Short: "⚡️ Quickly generate a disposable email straight from terminal.",
+	}
 
-func addCommands() {
-	var cmd = &cobra.Command{
+	rootCmd.Version = version
+
+	// Generate a new email
+	var generateCmd = &cobra.Command{
 		Use:   "g",
-		Short: "Generate a new email address.",
-		Long:  `Generates a new temporary email address.`,
+		Short: "Generate a new email",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := utils.CreateAccount()
-			if err != nil {
-				fmt.Printf("Error generating email: %v\n", err)
-			}
+			utils.CreateAccount()
 		},
 	}
 
-	cmd2 := &cobra.Command{
+	// Fetch messages from the inbox
+	var fetchMessagesCmd = &cobra.Command{
 		Use:   "m",
-		Short: "Fetch messages from inbox.",
-		Long:  `Fetches and displays messages from the inbox.`,
+		Short: "Fetch messages from the inbox",
 		Run: func(cmd *cobra.Command, args []string) {
 			emails, err := utils.FetchMessages()
 			if err != nil {
-				fmt.Printf("Error fetching messages: %v\n", err)
+				fmt.Println("Error fetching messages:", err)
 				return
 			}
 
 			if len(emails) == 0 {
-				fmt.Println("No new messages.")
 				return
 			}
 
-			// 在此处实现选择邮件的逻辑，例如打印列表并读取用户输入
-			var selected int64
-			for i, email := range emails {
-				fmt.Printf("%d. %s - From: %s\n", i+1, email.Subject, email.From.Address)
-			}
-			fmt.Printf("\nEnter the index of the email to open (0 to cancel): ")
-			scanner := bufio.NewScanner(os.Stdin)
-			scanner.Scan(&selected)
-
-			if selected <= 0 || int(selected) >= len(emails) {
-				return
+			// Show the emails using promptui
+			var choices []string
+			for index, email := range emails {
+				choices = append(choices, fmt.Sprintf("%d. %s - %s: %s", index+1, color.BlueString(email.Subject), color.YellowString("From:"), email.From.Address))
 			}
 
-			err = utils.OpenEmail(emails[int(selected)-1])
+			prompt := promptui.Select{
+				Label: "Select an email",
+				Items: choices,
+			}
+
+			index, _, err := prompt.Run()
 			if err != nil {
-				fmt.Printf("Error opening email: %v\n", err)
+				fmt.Println("Prompt failed:", err)
+				return
 			}
+
+			// Open the email
+			utils.OpenEmail(index + 1)
 		},
 	}
 
-	rootCmd.AddCommand(cmd, cmd2)
+	// Delete account
+	var deleteCmd = &cobra.Command{
+		Use:   "d",
+		Short: "Delete account",
+		Run: func(cmd *cobra.Command, args []string) {
+			utils.DeleteAccount()
+		},
+	}
+
+	// Show details of the account
+	var detailsCmd = &cobra.Command{
+		Use:   "me",
+		Short: "Show details of the account",
+		Run: func(cmd *cobra.Command, args []string) {
+			utils.ShowDetails()
+		},
+	}
+
+	rootCmd.AddCommand(generateCmd, fetchMessagesCmd, deleteCmd, detailsCmd)
+	rootCmd.Execute()
 }

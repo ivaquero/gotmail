@@ -3,10 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
-	"utils/index"
+	"../utils/index"
 
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
@@ -23,7 +22,7 @@ func main() {
 	}
 	defer file.Close()
 
-	bytes, _ := ioutil.ReadAll(file)
+	bytes, _ := os.ReadFile(file)
 	json.Unmarshal(bytes, &version) // Assuming version is a string in package.json
 
 	var rootCmd = &cobra.Command{
@@ -38,7 +37,7 @@ func main() {
 		Use:   "g",
 		Short: "Generate a new email",
 		Run: func(cmd *cobra.Command, args []string) {
-			utils.CreateAccount()
+			index.CreateAccount()
 		},
 	}
 
@@ -47,7 +46,7 @@ func main() {
 		Use:   "m",
 		Short: "Fetch messages from the inbox",
 		Run: func(cmd *cobra.Command, args []string) {
-			emails, err := utils.FetchMessages()
+			emails, err := index.FetchMessages()
 			if err != nil {
 				fmt.Println("Error fetching messages:", err)
 				return
@@ -75,7 +74,7 @@ func main() {
 			}
 
 			// Open the email
-			utils.OpenEmail(index + 1)
+			index.OpenEmail(index + 1)
 		},
 	}
 
@@ -84,7 +83,7 @@ func main() {
 		Use:   "d",
 		Short: "Delete account",
 		Run: func(cmd *cobra.Command, args []string) {
-			utils.DeleteAccount()
+			index.DeleteAccount()
 		},
 	}
 
@@ -93,7 +92,7 @@ func main() {
 		Use:   "me",
 		Short: "Show details of the account",
 		Run: func(cmd *cobra.Command, args []string) {
-			utils.ShowDetails()
+			index.ShowDetails()
 		},
 	}
 

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+
 	"math/rand"
 	"net/http"
 	"os"
@@ -14,7 +14,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mitchellh/go-homedir"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var basePath string
@@ -259,7 +259,7 @@ func openEmail(emailIndex int) {
 	}
 
 	// write the email html content to a file
-	ioutil.WriteFile(emailFilePath, []byte(emailResponse.HTML[0]), 0644)
+	os.WriteFile(emailFilePath, []byte(emailResponse.HTML[0]), 0644)
 
 	// open the email html file in the browser
 	// Opening the file is skipped for simplicity
@@ -278,7 +278,7 @@ func randString(n int) string {
 }
 
 func readAccountData() {
-	data, err := ioutil.ReadFile(filepath.Join(basePath, "account.json"))
+	data, err := os.ReadFile(filepath.Join(basePath, "account.json"))
 	if err != nil {
 		accountData = nil
 		return
@@ -288,7 +288,7 @@ func readAccountData() {
 
 func writeAccountData(account *Account) {
 	data, _ := json.Marshal(account)
-	ioutil.WriteFile(filepath.Join(basePath, "account.json"), data, 0644)
+	os.WriteFile(filepath.Join(basePath, "account.json"), data, 0644)
 }
 
 func main() {

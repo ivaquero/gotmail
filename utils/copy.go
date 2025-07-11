@@ -25,24 +25,18 @@ func copy(data string) error {
 		if err != nil {
 			return err
 		}
-		defer stdin.Close()
-
 		if err := cmd.Start(); err != nil {
 			return err
 		}
-
 		_, err = stdin.Write([]byte(data))
 		if err != nil {
 			return err
 		}
-
-		// close the child process
-		if err := cmd.Wait(); err != nil {
-			return err
-		}
+		stdin.Close()
+		cmd.Wait()
 		return nil
 	}
 
-	// reject the promise
-	return errors.New("Platform not supported")
+	// return an error if the platform is not supported
+	return errors.New("platform not supported")
 }

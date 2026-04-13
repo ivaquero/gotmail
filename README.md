@@ -1,78 +1,80 @@
 # GoTMail
 
-一个用 Go 语言编写的 [mail.tm](https://mail.tm/) 临时邮箱 CLI 工具，提供跨平台的临时邮箱管理功能。
+A temporary email CLI tool written in Go for [mail.tm](https://mail.tm/), providing cross-platform temporary email management functionality.
 
-## 🌟 功能特性
+**[中文版本](README-CN.md)**
 
-- **临时邮箱创建** - 快速创建 Mail.tm 临时邮箱账户
-- **消息管理** - 获取和列出收到的邮件消息
-- **邮件查看** - 在浏览器中打开特定邮件
-- **账户管理** - 查看账户详情和删除账户
-- **跨平台支持** - 支持 Windows、macOS 和 Linux
-- **剪贴板集成** - 自动复制邮箱地址到剪贴板
-- **命令行界面** - 简单易用的 CLI 操作
+## 🌟 Features
 
-## 🚀 快速开始
+- **Temporary Email Creation** - Quickly create Mail.tm temporary email accounts
+- **Message Management** - Fetch and list received email messages
+- **Email Viewing** - Open specific emails in your browser
+- **Account Management** - View account details and delete accounts
+- **Cross-platform Support** - Support for Windows, macOS, and Linux
+- **Clipboard Integration** - Automatically copy email addresses to clipboard
+- **Command Line Interface** - Simple and easy-to-use CLI operations
 
-### 安装
+## 🚀 Quick Start
 
-确保您的系统已安装 Go 1.20 或更高版本，然后运行：
+### Installation
+
+Ensure your system has Go 1.18 or higher installed, then run:
 
 ```bash
-go get -u github.com/ivaquero/gotmail
+go install github.com/ivaquero/gotmail
 ```
 
-### 基本用法
+### Basic Usage
 
-创建新的临时邮箱账户：
+Create a new temporary email account:
 
 ```bash
 gotmail create
 ```
 
-查看收到的邮件：
+View received emails:
 
 ```bash
 gotmail messages
 ```
 
-在浏览器中打开特定邮件：
+Open a specific email in your browser:
 
 ```bash
 gotmail open 1
 ```
 
-查看账户详情：
+View account details:
 
 ```bash
 gotmail details
 ```
 
-删除账户：
+Delete account:
 
 ```bash
 gotmail delete
 ```
 
-## 📖 命令说明
+## 📖 Command Reference
 
-| 命令            | 描述                   | 示例               |
-| --------------- | ---------------------- | ------------------ |
-| `create`        | 创建新的临时邮箱账户   | `gotmail create`   |
-| `messages`      | 获取并列出所有邮件     | `gotmail messages` |
-| `open <number>` | 在浏览器中打开指定邮件 | `gotmail open 1`   |
-| `details`       | 显示当前账户详情       | `gotmail details`  |
-| `delete`        | 删除当前账户           | `gotmail delete`   |
+|     Command     |             Description              |      Example       |
+| :-------------: | :----------------------------------: | :----------------: |
+|    `create`     | Create a new temporary email account |  `gotmail create`  |
+|   `messages`    |      Fetch and list all emails       | `gotmail messages` |
+| `open <number>` |   Open specified email in browser    |  `gotmail open 1`  |
+|    `details`    |   Display current account details    | `gotmail details`  |
+|    `delete`     |        Delete current account        |  `gotmail delete`  |
 
-## 🔧 开发指南
+## 🔧 Development Guide
 
-### 环境要求
+### Requirements
 
-- Go 1.20 或更高版本
-- 网络连接（用于 Mail.tm API）
-- 支持的浏览器（用于打开邮件）
+- Go 1.18 or higher
+- Network connection (for Mail.tm API)
+- Supported browser (for opening emails)
 
-### 构建项目
+### Building the Project
 
 ```bash
 git clone https://github.com/ivaquero/gotmail
@@ -80,70 +82,70 @@ cd gotmail
 go build
 ```
 
-### 运行测试
+### Running Tests
 
 ```bash
 go test ./tests/... -v
 ```
 
-### 代码规范
+### Code Standards
 
-- 遵循 Go 标准代码格式
-- 使用结构化的错误处理
-- 提供详细的错误信息
-- 保持跨平台兼容性
+- Follow Go standard code formatting
+- Use structured error handling
+- Provide detailed error information
+- Maintain cross-platform compatibility
 
-## 🔒 安全特性
+## 🔒 Security Features
 
-- **加密随机数生成** - 使用 `crypto/rand` 生成安全的随机字符串
-- **错误回退机制** - 在加密随机数生成失败时提供回退方案
-- **输入验证** - 对 API 响应和用户输入进行验证
-- **安全的数据存储** - 账户数据以 JSON 格式安全存储
+- **Cryptographic Random Generation** - Use `crypto/rand` to generate secure random strings
+- **Error Fallback Mechanism** - Provide fallback solutions when cryptographic random generation fails
+- **Input Validation** - Validate API responses and user inputs
+- **Secure Data Storage** - Store account data securely in JSON format
 
-## 🌐 API 集成
+## 🌐 API Integration
 
-本项目使用 Mail.tm API 提供临时邮箱服务：
+This project uses the Mail.tm API to provide temporary email services:
 
-- **API 端点**: `https://api.mail.tm`
-- **功能支持**: 账户创建、邮件获取、账户删除
-- **数据格式**: JSON
-- **认证方式**: Bearer Token
+- **API Endpoint**: `https://api.mail.tm`
+- **Feature Support**: Account creation, email retrieval, account deletion
+- **Data Format**: JSON
+- **Authentication**: Bearer Token
 
-## 📝 数据存储
+## 📝 Data Storage
 
-账户数据存储在本地文件中：
+Account data is stored in a local file:
 
-- **文件路径**: `<执行目录>/data/account.json`
-- **数据格式**: JSON
-- **包含信息**: 账户 ID、邮箱地址、密码、认证令牌
+- **File Path**: `<execution directory>/data/account.json`
+- **Data Format**: JSON
+- **Contains**: Account ID, email address, password, authentication token
 
-## 🐛 错误处理
+## 🐛 Error Handling
 
-项目实现了完善的错误处理机制：
+The project implements comprehensive error handling mechanisms:
 
-- **网络错误** - 处理 API 连接失败
-- **文件操作错误** - 处理数据读写失败
-- **剪贴板错误** - 处理跨平台剪贴板操作失败
-- **API 响应错误** - 处理 API 返回的错误状态
+- **Network Errors** - Handle API connection failures
+- **File Operation Errors** - Handle data read/write failures
+- **Clipboard Errors** - Handle cross-platform clipboard operation failures
+- **API Response Errors** - Handle API error status returns
 
-## 🤝 贡献指南
+## 🤝 Contributing Guidelines
 
-欢迎提交 Issue 和 Pull Request 来改进项目：
+Issues and Pull Requests are welcome to improve the project:
 
-1. Fork 项目仓库
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建 Pull Request
+1. Fork the project repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add some amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Create a Pull Request
 
-## 📄 许可证
+## 📄 License
 
-本项目采用 MIT 许可。
+This project is licensed under the MIT License.
 
-## 🙏 致谢
+## 🙏 Acknowledgments
 
-- [mail.tm](https://mail.tm) 提供临时邮箱服务
+- [mail.tm](https://mail.tm) for providing temporary email services
 
 ---
 
-**注意**: 这是一个临时邮箱工具，请勿用于接收重要或敏感信息。
+**Note**: This is a temporary email tool, please do not use it to receive important or sensitive information.

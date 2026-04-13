@@ -6,8 +6,8 @@ import (
 	"runtime"
 )
 
-// Copy 将数据复制到系统剪贴板
-// 支持 Windows (clip)、macOS (pbcopy) 和 Linux (xclip/xsel)
+// Copy copies data to the system clipboard
+// Supports Windows (clip), macOS (pbcopy), and Linux (xclip/xsel)
 func Copy(data string) error {
 	platform := runtime.GOOS
 
@@ -17,7 +17,7 @@ func Copy(data string) error {
 	case "darwin":
 		return copyToClipboard("pbcopy", data)
 	case "linux":
-		// 尝试使用 xclip，如果不存在则尝试 xsel
+		// Try xclip first, if not available try xsel
 		if err := copyToClipboard("xclip", data); err == nil {
 			return nil
 		}
@@ -30,7 +30,7 @@ func Copy(data string) error {
 	}
 }
 
-// copyToClipboard 执行具体的复制操作
+// copyToClipboard performs the actual copy operation
 func copyToClipboard(command string, data string) error {
 	cmd := exec.Command(command)
 

@@ -3,7 +3,7 @@
 [![Go Version](https://img.shields.io/badge/go-1.18+-blue.svg)](https://golang.org/doc/go1.18)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ivaquero/gotmail)](https://goreportcard.com/report/github.com/ivaquero/gotmail)
 
-A temporary email CLI tool written in Go for [mail.tm](https://mail.tm/), providing cross-platform temporary email management functionality.
+GoTMail (Go Temporary Mail) is temporary email CLI tool written in Go for [mail.tm](https://mail.tm/), providing cross-platform temporary email management functionality.
 
 **[中文版本](README-CN.md)**
 
@@ -21,7 +21,21 @@ A temporary email CLI tool written in Go for [mail.tm](https://mail.tm/), provid
 
 ### Installation
 
-Ensure your system has Go 1.18 or higher installed, then run:
+- Windows
+
+```bash
+scoop bucket add scoopforge/main-plus
+scoop install gotmail
+```
+
+- macOS 和 Linux
+
+```bash
+brew tap brewforge/more
+brew install gotmail
+```
+
+- Alternative method (requires Go 1.18 or higher)
 
 ```bash
 go install github.com/ivaquero/gotmail

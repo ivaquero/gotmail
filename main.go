@@ -10,20 +10,20 @@ import (
 )
 
 func main() {
-	// 获取当前执行目录
+	// Get current executable directory
 	execPath, err := os.Executable()
 	if err != nil {
 		log.Fatal("Failed to get executable path:", err)
 	}
 	execDir := filepath.Dir(execPath)
 
-	// 设置数据文件路径
+	// Set data file path
 	dataPath := filepath.Join(execDir, "data", "account.json")
 
-	// 创建邮件管理器
+	// Create mail manager
 	mailManager := utils.NewMailManager(dataPath)
 
-	// 如果没有参数，显示帮助
+	// If no arguments, show help
 	if len(os.Args) < 2 {
 		showHelp()
 		return

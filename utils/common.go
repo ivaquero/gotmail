@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// Account 账户数据结构
+// Account account data structure
 type Account struct {
 	ID        string    `json:"id"`
 	Address   string    `json:"address"`
@@ -20,54 +20,54 @@ type Account struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-// TokenData JWT令牌数据结构
+// TokenData JWT token data structure
 type TokenData struct {
 	Token string `json:"token"`
 }
 
-// Domain API返回的域名数据结构
+// Domain API returned domain data structure
 type Domain struct {
 	Domain string `json:"domain"`
 }
 
-// DomainResponse API域名响应
+// DomainResponse API domain response
 type DomainResponse struct {
 	HydraMember []Domain `json:"hydra:member"`
 }
 
-// Message 邮件消息数据结构
+// Message email message data structure
 type Message struct {
 	ID   string `json:"id"`
 	From string `json:"from"`
 	To   string `json:"to"`
 }
 
-// MessageResponse API消息响应
+// MessageResponse API message response
 type MessageResponse struct {
 	HydraMember []Message `json:"hydra:member"`
 }
 
-// EmailDetail 邮件详情数据结构
+// EmailDetail email detail data structure
 type EmailDetail struct {
 	ID      string   `json:"id"`
 	HTML    []string `json:"html"`
 	Subject string   `json:"subject"`
 }
 
-// Database 数据库操作结构
+// Database database operation structure
 type Database struct {
 	dataPath string
 	data     *Account
 }
 
-// NewDatabase 创建新的数据库实例
+// NewDatabase creates new database instance
 func NewDatabase(dataPath string) *Database {
 	return &Database{
 		dataPath: dataPath,
 	}
 }
 
-// Read 读取账户数据
+// Read reads account data
 func (db *Database) Read() error {
 	data, err := os.ReadFile(db.dataPath)
 	if err != nil {
@@ -87,7 +87,7 @@ func (db *Database) Read() error {
 	return nil
 }
 
-// Write 写入账户数据
+// Write writes account data
 func (db *Database) Write() error {
 	if db.data == nil {
 		return nil
@@ -98,7 +98,7 @@ func (db *Database) Write() error {
 		return fmt.Errorf("failed to marshal account data: %w", err)
 	}
 
-	// 确保目录存在
+	// Ensure directory exists
 	dir := filepath.Dir(db.dataPath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
@@ -111,17 +111,17 @@ func (db *Database) Write() error {
 	return nil
 }
 
-// GetData 获取账户数据
+// GetData gets account data
 func (db *Database) GetData() *Account {
 	return db.data
 }
 
-// SetData 设置账户数据
+// SetData sets account data
 func (db *Database) SetData(data *Account) {
 	db.data = data
 }
 
-// DeleteData 删除账户数据文件
+// DeleteData deletes account data file
 func (db *Database) DeleteData() error {
 	if err := os.Remove(db.dataPath); err != nil {
 		return fmt.Errorf("failed to delete account file: %w", err)
@@ -130,14 +130,14 @@ func (db *Database) DeleteData() error {
 	return nil
 }
 
-// GenerateRandomString 生成随机字符串
+// GenerateRandomString generates random string
 func GenerateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 	b := make([]byte, length)
 	for i := range b {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
 		if err != nil {
-			// 如果加密随机数生成失败，回退到时间种子
+			// If cryptographic random number generation fails, fall back to time seed
 			b[i] = charset[i%len(charset)]
 		} else {
 			b[i] = charset[num.Int64()]
@@ -146,13 +146,13 @@ func GenerateRandomString(length int) string {
 	return string(b)
 }
 
-// Spinner 简单的加载动画
+// Spinner simple loading animation
 type Spinner struct {
 	message string
 	done    chan bool
 }
 
-// NewSpinner 创建新的加载动画
+// NewSpinner creates new loading animation
 func NewSpinner(message string) *Spinner {
 	return &Spinner{
 		message: message,
@@ -160,7 +160,7 @@ func NewSpinner(message string) *Spinner {
 	}
 }
 
-// Start 开始加载动画
+// Start starts loading animation
 func (s *Spinner) Start() {
 	go func() {
 		chars := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
@@ -179,30 +179,30 @@ func (s *Spinner) Start() {
 	}()
 }
 
-// Stop 停止加载动画
+// Stop stops loading animation
 func (s *Spinner) Stop() {
 	close(s.done)
 }
 
-// Color 简单的颜色输出函数
+// Color simple color output functions
 type Color struct{}
 
-// Red 红色输出
+// Red red output
 func (c Color) Red(text string) string {
 	return fmt.Sprintf("\033[31m%s\033[0m", text)
 }
 
-// Green 绿色输出
+// Green green output
 func (c Color) Green(text string) string {
 	return fmt.Sprintf("\033[32m%s\033[0m", text)
 }
 
-// Blue 蓝色输出
+// Blue blue output
 func (c Color) Blue(text string) string {
 	return fmt.Sprintf("\033[34m%s\033[0m", text)
 }
 
-// Underline 下划线输出
+// Underline underline output
 func (c Color) Underline(text string) string {
 	return fmt.Sprintf("\033[4m%s\033[0m", text)
 }

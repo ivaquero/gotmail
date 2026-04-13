@@ -3,7 +3,7 @@
 [![Go Version](https://img.shields.io/badge/go-1.18+-blue.svg)](https://golang.org/doc/go1.18)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ivaquero/gotmail)](https://goreportcard.com/report/github.com/ivaquero/gotmail)
 
-一个用 Go 语言编写的 [mail.tm](https://mail.tm/) 临时邮箱 CLI 工具，提供跨平台的临时邮箱管理功能。
+GoTMail（Go Temporary Mail）是一个用 Go 语言编写的 [mail.tm](https://mail.tm/) 临时邮箱 CLI 工具，提供跨平台的临时邮箱管理功能。
 
 ## 🌟 功能特性
 
@@ -19,7 +19,21 @@
 
 ### 安装
 
-确保您的系统已安装 Go 1.18 或更高版本，然后运行：
+- Windows
+
+```bash
+scoop bucket add scoopforge/main-plus
+scoop install gotmail
+```
+
+- macOS 和 Linux
+
+```bash
+brew tap brewforge/more
+brew install gotmail
+```
+
+- 备选方法（需要 Go 1.18 或更高版本）
 
 ```bash
 go install github.com/ivaquero/gotmail

@@ -12,14 +12,14 @@ import (
 	"time"
 )
 
-// MailManager 邮件管理器
+// MailManager mail manager
 type MailManager struct {
 	db     *Database
 	client *http.Client
 	color  *Color
 }
 
-// NewMailManager 创建新的邮件管理器
+// NewMailManager creates new mail manager
 func NewMailManager(dataPath string) *MailManager {
 	return &MailManager{
 		db: NewDatabase(dataPath),
@@ -30,18 +30,18 @@ func NewMailManager(dataPath string) *MailManager {
 	}
 }
 
-// CreateAccount 创建新账户
+// CreateAccount creates new account
 func (m *MailManager) CreateAccount() error {
 	spinner := NewSpinner("creating...")
 	spinner.Start()
 	defer spinner.Stop()
 
-	// 读取账户数据
+	// Read account data
 	if err := m.db.Read(); err != nil {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
 
-	// 如果账户已存在
+	// If account already exists
 	if m.db.GetData() != nil {
 		fmt.Printf("\r%s\n", m.color.Red("Account already exists"))
 		return nil
@@ -53,23 +53,23 @@ func (m *MailManager) CreateAccount() error {
 		return fmt.Errorf("failed to get domain: %w", err)
 	}
 
-	// 生成随机邮箱和密码
+	// Generate random email and password
 	email := fmt.Sprintf("%s@%s", GenerateRandomString(7), domain)
 	password := GenerateRandomString(10)
 
-	// 创建账户
+	// Create account
 	accountData, err := m.createAccountAPI(email, password)
 	if err != nil {
 		return fmt.Errorf("failed to create account: %w", err)
 	}
 
-	// 获取JWT令牌
+	// Get JWT token
 	tokenData, err := m.getToken(email, password)
 	if err != nil {
 		return fmt.Errorf("failed to get token: %w", err)
 	}
 
-	// 构建账户信息
+	// Build account information
 	account := &Account{
 		ID:        accountData["id"].(string),
 		Address:   email,
@@ -78,12 +78,12 @@ func (m *MailManager) CreateAccount() error {
 		CreatedAt: time.Now(),
 	}
 
-	// 复制邮箱到剪贴板
+	// Copy email to clipboard
 	if err := Copy(email); err != nil {
 		fmt.Printf("Warning: failed to copy email to clipboard: %v\n", err)
 	}
 
-	// 保存账户数据
+	// Save account data
 	m.db.SetData(account)
 	if err := m.db.Write(); err != nil {
 		return fmt.Errorf("failed to save account: %w", err)
@@ -93,7 +93,7 @@ func (m *MailManager) CreateAccount() error {
 	return nil
 }
 
-// FetchMessages 获取邮件消息
+// FetchMessages fetches email messages
 func (m *MailManager) FetchMessages() ([]Message, error) {
 	spinner := NewSpinner("fetching...")
 	spinner.Start()
@@ -122,7 +122,7 @@ func (m *MailManager) FetchMessages() ([]Message, error) {
 	return messages, nil
 }
 
-// DeleteAccount 删除账户
+// DeleteAccount deletes account
 func (m *MailManager) DeleteAccount() error {
 	spinner := NewSpinner("deleting...")
 	spinner.Start()
@@ -150,7 +150,7 @@ func (m *MailManager) DeleteAccount() error {
 	return nil
 }
 
-// ShowDetails 显示账户详情
+// ShowDetails shows account details
 func (m *MailManager) ShowDetails() error {
 	spinner := NewSpinner("fetching details...")
 	spinner.Start()
@@ -178,7 +178,7 @@ func (m *MailManager) ShowDetails() error {
 	return nil
 }
 
-// OpenEmail 打开指定邮件
+// OpenEmail opens specified email
 func (m *MailManager) OpenEmail(emailIndex int) error {
 	emailFilePath := filepath.Join(getCurrentDir(), "../data/email.html")
 	spinner := NewSpinner("opening...")
@@ -214,7 +214,7 @@ func (m *MailManager) OpenEmail(emailIndex int) error {
 		return nil
 	}
 
-	// 写入HTML文件
+	// Write HTML file
 	dir := filepath.Dir(emailFilePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
@@ -224,7 +224,7 @@ func (m *MailManager) OpenEmail(emailIndex int) error {
 		return fmt.Errorf("failed to write email file: %w", err)
 	}
 
-	// 在浏览器中打开文件
+	// Open file in browser
 	if err := openInBrowser(emailFilePath); err != nil {
 		return fmt.Errorf("failed to open email in browser: %w", err)
 	}
@@ -232,7 +232,7 @@ func (m *MailManager) OpenEmail(emailIndex int) error {
 	return nil
 }
 
-// getDomain 获取可用域名
+// getDomain gets available domain
 func (m *MailManager) getDomain() (string, error) {
 	resp, err := m.client.Get("https://api.mail.tm/domains?page=1")
 	if err != nil {

@@ -28,7 +28,7 @@ func TestCopy(t *testing.T) {
 		{"多行文本", "第一行\n第二行\n第三行"},
 	}
 
-	fmt.Println("=== 剪贴板复制功能测试 ===\n")
+	fmt.Println("=== 剪贴板复制功能测试 ===")
 
 	for i, tc := range testCases {
 		fmt.Printf("测试 %d: %s\n", i+1, tc.name)
@@ -41,7 +41,7 @@ func TestCopy(t *testing.T) {
 			continue
 		}
 
-		fmt.Println(" 成功！\n")
+		fmt.Println(" 成功！")
 	}
 
 	fmt.Println("=== 所有测试完成 ===")

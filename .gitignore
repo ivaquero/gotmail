@@ -1,3 +1,8 @@
+*
+!*.*
+!*/
+!LICENSE
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -38,8 +43,5 @@ Thumbs.db
 dist/
 build/
 
-*
-!*.*
-!*/
 
 data

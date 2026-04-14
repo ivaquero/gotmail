@@ -1,9 +1,8 @@
-# Dependabot 配置文件
-# 文档: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
 
 version: 2
 updates:
-  # Go 模块更新
+  # Go Modules
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -16,7 +15,7 @@ updates:
       - "dependencies"
       - "go"
 
-  # GitHub Actions 更新
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

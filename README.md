@@ -2,6 +2,8 @@
 
 [![Go Version](https://img.shields.io/badge/go-1.18+-blue.svg)](https://golang.org/doc/go1.18)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ivaquero/gotmail)](https://goreportcard.com/report/github.com/ivaquero/gotmail)
+![code size](https://img.shields.io/github/languages/code-size/ivaquero/gotmail.svg)
+![repo size](https://img.shields.io/github/repo-size/ivaquero/gotmail.svg)
 
 GoTMail (Go Temporary Mail) is temporary email CLI tool written in Go for [mail.tm](https://mail.tm/), providing cross-platform temporary email management functionality.
 

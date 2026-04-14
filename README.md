@@ -67,7 +67,7 @@ gotmail open 1
 View account details:
 
 ```bash
-gotmail details
+gotmail show
 ```
 
 Delete account:
@@ -89,7 +89,7 @@ gotmail export /path/to/account.json
 |      `new`      | Create a new temporary email account  |            `gotmail new`             |
 |      `msg`      |       Fetch and list all emails       |            `gotmail msg`             |
 | `open <number>` |    Open specified email in browser    |           `gotmail open 1`           |
-|    `details`    |    Display current account details    |          `gotmail details`           |
+|     `show`      |     Display current account show      |            `gotmail show`            |
 |      `del`      |        Delete current account         |            `gotmail del`             |
 | `export <path>` | Export account data to specified path | `gotmail export backup/account.json` |
 

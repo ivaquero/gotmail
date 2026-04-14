@@ -60,10 +60,10 @@ gotmail msg
 gotmail open 1
 ```
 
-查看账户详情：
+查看账户信息：
 
 ```bash
-gotmail details
+gotmail show
 ```
 
 删除账户：
@@ -85,7 +85,7 @@ gotmail export /path/to/account.json
 |      `new`      |  创建新的临时邮箱账户  |            `gotmail new`             |
 |      `msg`      |   获取并列出所有邮件   |            `gotmail msg`             |
 | `open <number>` | 在浏览器中打开指定邮件 |           `gotmail open 1`           |
-|    `details`    |    显示当前账户详情    |          `gotmail details`           |
+|     `show`      |    显示当前账户信息    |            `gotmail show`            |
 |      `del`      |      删除当前账户      |            `gotmail del`             |
 | `export <path>` | 导出账户数据到指定路径 | `gotmail export backup/account.json` |
 

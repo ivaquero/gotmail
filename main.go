@@ -54,7 +54,7 @@ func main() {
 			log.Fatal("Error deleting account:", err)
 		}
 
-	case "details":
+	case "show":
 		if err := mailManager.ShowDetails(); err != nil {
 			log.Fatal("Error showing details:", err)
 		}
@@ -94,12 +94,13 @@ func showHelp() {
 	fmt.Println("  new             - Create a new account")
 	fmt.Println("  msg             - Fetch and list messages")
 	fmt.Println("  del             - Delete the account")
-	fmt.Println("  details         - Show account details")
+	fmt.Println("  show            - Show account details")
 	fmt.Println("  open <number>   - Open specific email in browser")
 	fmt.Println("  export <path>   - Export account data to specified path")
 	fmt.Println("\nExamples:")
 	fmt.Println("gotmail new")
 	fmt.Println("gotmail msg")
+	fmt.Println("gotmail show")
 	fmt.Println("gotmail open 1")
 	fmt.Println("gotmail export /path/to/account.json")
 }

@@ -41,9 +41,10 @@ func (m *MailManager) CreateAccount() error {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
 
-	// If account already exists
-	if m.db.GetData() != nil {
-		fmt.Printf("%s\n", m.color.Red("Account already exists"))
+	// Check if maximum accounts limit reached (optional, can be adjusted)
+	accounts := m.db.GetData()
+	if len(accounts) >= 10 {
+		fmt.Printf("%s\n", m.color.Red("Maximum 10 accounts allowed"))
 		return nil
 	}
 
@@ -84,12 +85,14 @@ func (m *MailManager) CreateAccount() error {
 	}
 
 	// Save account data
-	m.db.SetData(account)
+	if err := m.db.AddAccount(account); err != nil {
+		return fmt.Errorf("failed to save account: %w", err)
+	}
 	if err := m.db.Write(); err != nil {
 		return fmt.Errorf("failed to save account: %w", err)
 	}
 
-	fmt.Printf("\r%s: %s\n", m.color.Blue("Account created"), m.color.Underline(m.color.Green(email)))
+	fmt.Printf("\r%s: %s (ID: %s)\n", m.color.Blue("Account created"), m.color.Underline(m.color.Green(email)), m.color.Green(account.ID))
 	return nil
 }
 
@@ -99,17 +102,15 @@ func (m *MailManager) ExportAccount(exportFolder string) error {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
 
-	account := m.db.GetData()
-	if account == nil {
-		return fmt.Errorf("account not created yet")
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		return fmt.Errorf("no accounts found")
 	}
 
 	// Ensure export directory exists
 	if err := os.MkdirAll(exportFolder, 0755); err != nil {
 		return fmt.Errorf("failed to create export directory: %w", err)
 	}
-
-	// Generate default filename with timestamp
 
 	exportPath := filepath.Join(exportFolder, "accounts.json")
 
@@ -128,9 +129,59 @@ func (m *MailManager) ExportAccount(exportFolder string) error {
 	return nil
 }
 
-// FetchMessages fetches email messages
-func (m *MailManager) FetchMessages() ([]Message, error) {
-	spinner := NewSpinner("fetching...")
+// ExportAccountByID exports specific account data to specified path
+func (m *MailManager) ExportAccountByID(accountID string, exportFolder string) error {
+	if err := m.db.Read(); err != nil {
+		return fmt.Errorf("failed to read database: %w", err)
+	}
+
+	account := m.db.GetAccount(accountID)
+	if account == nil {
+		return fmt.Errorf("account with ID %s not found", accountID)
+	}
+
+	// Ensure export directory exists
+	if err := os.MkdirAll(exportFolder, 0755); err != nil {
+		return fmt.Errorf("failed to create export directory: %w", err)
+	}
+
+	exportPath := filepath.Join(exportFolder, fmt.Sprintf("account_%s.json", accountID))
+
+	// Create single account data for export
+	singleAccountData := map[string]*Account{accountID: account}
+	exportData, err := json.MarshalIndent(singleAccountData, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal account data: %w", err)
+	}
+
+	// Write to export path
+	if err := os.WriteFile(exportPath, exportData, 0644); err != nil {
+		return fmt.Errorf("failed to write export file: %w", err)
+	}
+
+	fmt.Printf("Account %s exported to: %s\n", accountID, exportPath)
+	return nil
+}
+
+// ListAccounts lists all accounts
+func (m *MailManager) ListAccounts() error {
+	if err := m.db.Read(); err != nil {
+		return fmt.Errorf("failed to read database: %w", err)
+	}
+
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		fmt.Printf("%s\n", m.color.Red("No accounts found"))
+		return nil
+	}
+
+	fmt.Println(FormatAccountList(accounts))
+	return nil
+}
+
+// FetchMessagesByAccountID fetches messages for specific account
+func (m *MailManager) FetchMessagesByAccountID(accountID string) ([]Message, error) {
+	spinner := NewSpinner("fetching messages...")
 	spinner.Start()
 	defer spinner.Stop()
 
@@ -138,10 +189,9 @@ func (m *MailManager) FetchMessages() ([]Message, error) {
 		return nil, fmt.Errorf("failed to read database: %w", err)
 	}
 
-	account := m.db.GetData()
+	account := m.db.GetAccount(accountID)
 	if account == nil {
-		fmt.Printf("%s\n", m.color.Red("Account not created yet"))
-		return nil, nil
+		return nil, fmt.Errorf("account with ID %s not found", accountID)
 	}
 
 	messages, err := m.fetchMessagesAPI(account.Token.Token)
@@ -157,7 +207,98 @@ func (m *MailManager) FetchMessages() ([]Message, error) {
 	return messages, nil
 }
 
-// DeleteAccount deletes account
+// ShowAccountDetails shows details for specific account
+func (m *MailManager) ShowAccountDetails(accountID string) error {
+	spinner := NewSpinner("fetching details...")
+	spinner.Start()
+	defer spinner.Stop()
+
+	if err := m.db.Read(); err != nil {
+		return fmt.Errorf("failed to read database: %w", err)
+	}
+
+	account := m.db.GetAccount(accountID)
+	if account == nil {
+		return fmt.Errorf("account with ID %s not found", accountID)
+	}
+
+	// Use existing account data instead of API call for basic info
+	fmt.Printf("\n    Account ID: %s\n    Email: %s\n    Created: %s\n",
+		m.color.Green(account.ID),
+		m.color.Underline(m.color.Green(account.Address)),
+		m.color.Green(account.CreatedAt.Format("2006-01-02 15:04:05")))
+
+	return nil
+}
+
+// DeleteAccountByID deletes specific account by ID
+func (m *MailManager) DeleteAccountByID(accountID string) error {
+	spinner := NewSpinner("deleting account...")
+	spinner.Start()
+	defer spinner.Stop()
+
+	if err := m.db.Read(); err != nil {
+		return fmt.Errorf("failed to read database: %w", err)
+	}
+
+	account := m.db.GetAccount(accountID)
+	if account == nil {
+		return fmt.Errorf("account with ID %s not found", accountID)
+	}
+
+	if err := m.deleteAccountAPI(account.ID, account.Token.Token); err != nil {
+		return fmt.Errorf("failed to delete account: %w", err)
+	}
+
+	if err := m.db.DeleteAccount(accountID); err != nil {
+		return fmt.Errorf("failed to delete account data: %w", err)
+	}
+
+	if err := m.db.Write(); err != nil {
+		return fmt.Errorf("failed to save database: %w", err)
+	}
+
+	fmt.Printf("\r%s\n", m.color.Blue("Account deleted"))
+	return nil
+}
+
+// FetchMessages fetches email messages for the first account (backward compatibility)
+func (m *MailManager) FetchMessages() ([]Message, error) {
+	spinner := NewSpinner("fetching...")
+	spinner.Start()
+	defer spinner.Stop()
+
+	if err := m.db.Read(); err != nil {
+		return nil, fmt.Errorf("failed to read database: %w", err)
+	}
+
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		fmt.Printf("%s\n", m.color.Red("No accounts found"))
+		return nil, nil
+	}
+
+	// Get first account for backward compatibility
+	var account *Account
+	for _, acc := range accounts {
+		account = acc
+		break
+	}
+
+	messages, err := m.fetchMessagesAPI(account.Token.Token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch messages: %w", err)
+	}
+
+	if len(messages) == 0 {
+		fmt.Printf("\r\033[K%s\n", m.color.Red("No Emails"))
+		return nil, nil
+	}
+
+	return messages, nil
+}
+
+// DeleteAccount deletes the first account (backward compatibility)
 func (m *MailManager) DeleteAccount() error {
 	spinner := NewSpinner("deleting...")
 	spinner.Start()
@@ -167,25 +308,38 @@ func (m *MailManager) DeleteAccount() error {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
 
-	account := m.db.GetData()
-	if account == nil {
-		fmt.Printf("%s\n", m.color.Red("Account not created yet"))
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		fmt.Printf("%s\n", m.color.Red("No accounts found"))
 		return nil
+	}
+
+	// Get first account for backward compatibility
+	var account *Account
+	var accountID string
+	for id, acc := range accounts {
+		account = acc
+		accountID = id
+		break
 	}
 
 	if err := m.deleteAccountAPI(account.ID, account.Token.Token); err != nil {
 		return fmt.Errorf("failed to delete account: %w", err)
 	}
 
-	if err := m.db.DeleteData(); err != nil {
+	if err := m.db.DeleteAccount(accountID); err != nil {
 		return fmt.Errorf("failed to delete account data: %w", err)
+	}
+
+	if err := m.db.Write(); err != nil {
+		return fmt.Errorf("failed to save database: %w", err)
 	}
 
 	fmt.Printf("\r%s\n", m.color.Blue("Account deleted"))
 	return nil
 }
 
-// ShowDetails shows account details
+// ShowDetails shows account details (backward compatibility - shows first account)
 func (m *MailManager) ShowDetails() error {
 	spinner := NewSpinner("fetching details...")
 	spinner.Start()
@@ -195,25 +349,29 @@ func (m *MailManager) ShowDetails() error {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
 
-	account := m.db.GetData()
-	if account == nil {
-		fmt.Printf("%s\n", m.color.Red("Account not created yet"))
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		fmt.Printf("%s\n", m.color.Red("No accounts found"))
 		return nil
 	}
 
-	details, err := m.getAccountDetailsAPI(account.ID, account.Token.Token)
-	if err != nil {
-		return fmt.Errorf("failed to get account details: %w", err)
+	// Get first account for backward compatibility
+	var account *Account
+	for _, acc := range accounts {
+		account = acc
+		break
 	}
 
-	fmt.Printf("\n    Email: %s\n    createdAt: %s\n",
-		m.color.Underline(m.color.Green(details["address"].(string))),
+	// Use existing account data instead of API call for basic info
+	fmt.Printf("\n    Account ID: %s\n    Email: %s\n    Created: %s\n",
+		m.color.Green(account.ID),
+		m.color.Underline(m.color.Green(account.Address)),
 		m.color.Green(account.CreatedAt.Format("2006-01-02 15:04:05")))
 
 	return nil
 }
 
-// OpenEmail opens specified email
+// OpenEmail opens specified email (backward compatibility - uses first account)
 func (m *MailManager) OpenEmail(emailIndex int) error {
 	emailFilePath := filepath.Join(getCurrentDir(), "../data/email.html")
 	spinner := NewSpinner("opening...")
@@ -224,12 +382,73 @@ func (m *MailManager) OpenEmail(emailIndex int) error {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
 
-	account := m.db.GetData()
-	if account == nil {
-		return fmt.Errorf("account not found")
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		return fmt.Errorf("no accounts found")
 	}
 
-	messages, err := m.FetchMessages()
+	// Get first account for backward compatibility
+	var account *Account
+	for _, acc := range accounts {
+		account = acc
+		break
+	}
+
+	messages, err := m.fetchMessagesAPI(account.Token.Token)
+	if err != nil {
+		return fmt.Errorf("failed to fetch messages: %w", err)
+	}
+
+	if len(messages) == 0 || emailIndex < 1 || emailIndex > len(messages) {
+		return fmt.Errorf("invalid email index")
+	}
+
+	mailToOpen := messages[emailIndex-1]
+	emailDetail, err := m.getEmailDetailAPI(mailToOpen.ID, account.Token.Token)
+	if err != nil {
+		return fmt.Errorf("failed to get email detail: %w", err)
+	}
+
+	if len(emailDetail.HTML) == 0 {
+		fmt.Printf("%s\n", m.color.Red("No HTML content found"))
+		return nil
+	}
+
+	// Write HTML file
+	dir := filepath.Dir(emailFilePath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	if err := os.WriteFile(emailFilePath, []byte(emailDetail.HTML[0]), 0644); err != nil {
+		return fmt.Errorf("failed to write email file: %w", err)
+	}
+
+	// Open file in browser
+	if err := openInBrowser(emailFilePath); err != nil {
+		return fmt.Errorf("failed to open email in browser: %w", err)
+	}
+
+	return nil
+}
+
+// OpenEmailByAccountID opens specified email for specific account
+func (m *MailManager) OpenEmailByAccountID(accountID string, emailIndex int) error {
+	emailFilePath := filepath.Join(getCurrentDir(), "../data/email.html")
+	spinner := NewSpinner("opening...")
+	spinner.Start()
+	defer spinner.Stop()
+
+	if err := m.db.Read(); err != nil {
+		return fmt.Errorf("failed to read database: %w", err)
+	}
+
+	account := m.db.GetAccount(accountID)
+	if account == nil {
+		return fmt.Errorf("account with ID %s not found", accountID)
+	}
+
+	messages, err := m.fetchMessagesAPI(account.Token.Token)
 	if err != nil {
 		return fmt.Errorf("failed to fetch messages: %w", err)
 	}

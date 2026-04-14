@@ -11,14 +11,16 @@ GoTMail (Go Temporary Mail) is temporary email CLI tool written in Go for [mail.
 
 ## 🌟 Features
 
-- **Temporary Email Creation** - Quickly create Mail.tm temporary email accounts
-- **Message Management** - Fetch and list received email messages
-- **Email Viewing** - Open specific emails in your browser
-- **Account Management** - View account details and delete accounts
-- **Data Export** - Export account data to specified paths
-- **Cross-platform Support** - Support for Windows, macOS, and Linux
-- **Clipboard Integration** - Automatically copy email addresses to clipboard
-- **Command Line Interface** - Simple and easy-to-use CLI operations
+- **Multi-Account Management**: Support creating and managing multiple temporary email accounts (up to 10)
+- **Temporary Email Creation**: Quickly create Mail.tm temporary email accounts
+- **Message Management**: Fetch and list received email messages
+- **Email Viewing**: Open specific emails in your browser
+- **Account Management**: View account details and delete accounts
+- **Data Export**: Export all accounts or specific account data to specified paths
+- **Cross-platform Support**: Support for Windows, macOS, and Linux
+- **Clipboard Integration**: Automatically copy email addresses to clipboard
+- **Command Line Interface**: Simple and easy-to-use CLI operations
+- **Backward Compatibility**: Support automatic conversion of old single-account files
 
 ## 🚀 Quick Start
 
@@ -79,19 +81,25 @@ gotmail del
 Export account data:
 
 ```bash
-gotmail export /path/to/account.json
+gotmail export /backup path/
 ```
 
 ## 📖 Command Reference
 
-|     Command     |              Description              |               Example                |
-| :-------------: | :-----------------------------------: | :----------------------------------: |
-|      `new`      | Create a new temporary email account  |            `gotmail new`             |
-|      `msg`      |       Fetch and list all emails       |            `gotmail msg`             |
-| `open <number>` |    Open specified email in browser    |           `gotmail open 1`           |
-|     `show`      |     Display current account show      |            `gotmail show`            |
-|      `del`      |        Delete current account         |            `gotmail del`             |
-| `export <path>` | Export account data to specified path | `gotmail export backup/account.json` |
+|          Command          |                  Description                   |               Example                |
+| :-----------------------: | :--------------------------------------------: | :----------------------------------: |
+|           `new`           |      Create a new temporary email account      |            `gotmail new`             |
+|          `list`           |          List all account information          |            `gotmail list`            |
+|           `msg`           |           Fetch and list all emails            |            `gotmail msg`             |
+|      `msg --id <id>`      |      Fetch emails for a specific account       |      `gotmail msg --id abc123`       |
+|      `open <number>`      |        Open specified email in browser         |           `gotmail open 1`           |
+| `open <number> --id <id>` |   Open specified email for specific account    |     `gotmail open 1 --id abc123`     |
+|          `show`           |          Display current account show          |            `gotmail show`            |
+|        `show --id`        |         Display specific account show          |      `gotmail show --id abc123`      |
+|           `del`           |             Delete current account             |            `gotmail del`             |
+|        `del --id`         |            Delete specific account             |      `gotmail del --id abc123`       |
+|      `export <path>`      |   Export all account data to specified path    | `gotmail export backup/account.json` |
+| `export <path> --id <id>` | Export specific account data to specified path | `gotmail export backup/ --id abc123` |
 
 ## 🔧 Development Guide
 
@@ -124,10 +132,10 @@ go test ./tests/... -v
 
 ## 🔒 Security Features
 
-- **Cryptographic Random Generation** - Use `crypto/rand` to generate secure random strings
-- **Error Fallback Mechanism** - Provide fallback solutions when cryptographic random generation fails
-- **Input Validation** - Validate API responses and user inputs
-- **Secure Data Storage** - Store account data securely in JSON format
+- **Cryptographic Random Generation**: Use `crypto/rand` to generate secure random strings
+- **Error Fallback Mechanism**: Provide fallback solutions when cryptographic random generation fails
+- **Input Validation**: Validate API responses and user inputs
+- **Secure Data Storage**: Store account data securely in JSON format
 
 ## 🌐 API Integration
 
@@ -142,28 +150,46 @@ This project uses the Mail.tm API to provide temporary email services:
 
 Account data is stored in a local file:
 
-- **File Path**: `<execution directory>/data/account.json`
+- **File Path**: `<execution directory>/accounts.json`
 - **Data Format**: JSON
-- **Contains**: Account ID, email address, password, authentication token
+- **Contains**: Multiple accounts with ID, email address, password, authentication token
+- **Backward Compatibility**: Automatically converts old single-account file formats
 
 ### Data Export
 
-You can export account data to any specified path using the `export` command:
+You can export all account data to any specified path using the `export` command:
 
 ```bash
-gotmail export /path/to/backup/account.json
+gotmail export /path/to/backup/
+```
+
+Or export data for a specific account:
+
+```bash
+gotmail export /path/to/backup/ --id abc123
 ```
 
 The exported file will be an exact copy of the original account data file, preserving all account information and formatting.
+
+### Multi-Account Management
+
+GoTMail now supports creating and managing multiple temporary email accounts (up to 10):
+
+1. **Create New Account**: Use `gotmail new` to create a new account
+2. **View All Accounts**: Use `gotmail list` to list all created accounts
+3. **Account-Specific Operations**: Most commands support the `--id <account_id>` parameter to specify which account to operate on
+4. **Backward Compatibility**: For single-account scenarios, commands can still be used without the `--id` parameter
+
+When performing operations that require an account, if multiple accounts exist, the system will prompt you to select which account to use.
 
 ## 🐛 Error Handling
 
 The project implements comprehensive error handling mechanisms:
 
-- **Network Errors** - Handle API connection failures
-- **File Operation Errors** - Handle data read/write failures
-- **Clipboard Errors** - Handle cross-platform clipboard operation failures
-- **API Response Errors** - Handle API error status returns
+- **Network Errors**: Handle API connection failures
+- **File Operation Errors**: Handle data read/write failures
+- **Clipboard Errors**: Handle cross-platform clipboard operation failures
+- **API Response Errors**: Handle API error status returns
 
 ## 🤝 Contributing Guidelines
 

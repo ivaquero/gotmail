@@ -7,14 +7,16 @@ GoTMail（Go Temporary Mail）是一个用 Go 语言编写的 [mail.tm](https://
 
 ## 🌟 功能特性
 
-- **临时邮箱创建** - 快速创建 Mail.tm 临时邮箱账户
-- **消息管理** - 获取和列出收到的邮件消息
-- **邮件查看** - 在浏览器中打开特定邮件
-- **账户管理** - 查看账户详情和删除账户
-- **数据导出** - 导出账户数据到指定路径
-- **跨平台支持** - 支持 Windows、macOS 和 Linux
-- **剪贴板集成** - 自动复制邮箱地址到剪贴板
-- **命令行界面** - 简单易用的 CLI 操作
+- **多账户管理**：支持创建和管理多个临时邮箱账户（最多10个）
+- **临时邮箱创建**：快速创建 Mail.tm 临时邮箱账户
+- **消息管理**：获取和列出收到的邮件消息
+- **邮件查看**：在浏览器中打开特定邮件
+- **账户管理**：查看账户详情和删除账户
+- **数据导出**：导出所有账户或指定账户数据到指定路径
+- **跨平台支持**：支持 Windows、macOS 和 Linux
+- **剪贴板集成**：自动复制邮箱地址到剪贴板
+- **命令行界面**：简单易用的 CLI 操作
+- **向后兼容**：支持旧版单账户文件的自动转换
 
 ## 🚀 快速开始
 
@@ -48,10 +50,22 @@ go install github.com/ivaquero/gotmail
 gotmail new
 ```
 
+列出所有账户：
+
+```bash
+gotmail list
+```
+
 查看收到的邮件：
 
 ```bash
 gotmail msg
+```
+
+查看指定账户的邮件：
+
+```bash
+gotmail msg --id abc123
 ```
 
 在浏览器中打开特定邮件：
@@ -60,34 +74,64 @@ gotmail msg
 gotmail open 1
 ```
 
+打开指定账户的邮件：
+
+```bash
+gotmail open 1 --id abc123
+```
+
 查看账户信息：
 
 ```bash
 gotmail show
 ```
 
-删除账户：
+查看指定账户信息：
+
+```bash
+gotmail show --id abc123
+```
+
+删除当前账户：
 
 ```bash
 gotmail del
 ```
 
-导出账户数据：
+删除指定账户：
 
 ```bash
-gotmail export /path/to/account.json
+gotmail del --id abc123
+```
+
+导出所有账户数据：
+
+```bash
+gotmail export /备份文件夹/
+```
+
+导出指定账户数据：
+
+```bash
+gotmail export /备份文件夹/ --id abc123
 ```
 
 ## 📖 命令说明
 
-|      命令       |          描述          |                 示例                 |
-| :-------------: | :--------------------: | :----------------------------------: |
-|      `new`      |  创建新的临时邮箱账户  |            `gotmail new`             |
-|      `msg`      |   获取并列出所有邮件   |            `gotmail msg`             |
-| `open <number>` | 在浏览器中打开指定邮件 |           `gotmail open 1`           |
-|     `show`      |    显示当前账户信息    |            `gotmail show`            |
-|      `del`      |      删除当前账户      |            `gotmail del`             |
-| `export <path>` | 导出账户数据到指定路径 | `gotmail export backup/account.json` |
+|           命令            |            描述            |                 示例                 |
+| :-----------------------: | :------------------------: | :----------------------------------: |
+|           `new`           |    创建新的临时邮箱账户    |            `gotmail new`             |
+|          `list`           |      列出所有账户信息      |            `gotmail list`            |
+|           `msg`           |     获取并列出所有邮件     |            `gotmail msg`             |
+|      `msg --id <id>`      |   获取指定账户的所有邮件   |      `gotmail msg --id abc123`       |
+|      `open <number>`      |   在浏览器中打开指定邮件   |           `gotmail open 1`           |
+| `open <number> --id <id>` |   打开指定账户的指定邮件   |     `gotmail open 1 --id abc123`     |
+|          `show`           |      显示当前账户信息      |            `gotmail show`            |
+|        `show --id`        |      显示指定账户信息      |      `gotmail show --id abc123`      |
+|           `del`           |        删除当前账户        |            `gotmail del`             |
+|        `del --id`         |        删除指定账户        |      `gotmail del --id abc123`       |
+|      `export <path>`      | 导出所有账户数据到指定路径 | `gotmail export backup/account.json` |
+| `export <path> --id <id>` | 导出指定账户数据到指定路径 | `gotmail export backup/ --id abc123` |
 
 ## 🔧 开发指南
 
@@ -120,10 +164,10 @@ go test ./tests/... -v
 
 ## 🔒 安全特性
 
-- **加密随机数生成** - 使用 `crypto/rand` 生成安全的随机字符串
-- **错误回退机制** - 在加密随机数生成失败时提供回退方案
-- **输入验证** - 对 API 响应和用户输入进行验证
-- **安全的数据存储** - 账户数据以 JSON 格式安全存储
+- **加密随机数生成**：使用 `crypto/rand` 生成安全的随机字符串
+- **错误回退机制**：在加密随机数生成失败时提供回退方案
+- **输入验证**：对 API 响应和用户输入进行验证
+- **安全的数据存储**：账户数据以 JSON 格式安全存储
 
 ## 🌐 API 集成
 
@@ -144,22 +188,39 @@ go test ./tests/... -v
 
 ### 数据导出
 
-您可以使用 `export` 命令将账户数据导出到任意指定路径：
+您可以使用 `export` 命令将所有账户数据导出到任意指定路径：
 
 ```bash
-gotmail export /path/to/backup/account.json
+gotmail export /path/to/backup/
+```
+
+或者导出指定账户的数据：
+
+```bash
+gotmail export /path/to/backup/ --id abc123
 ```
 
 导出的文件将是原始账户数据文件的完整副本，保留所有账户信息和格式。
+
+### 多账户管理
+
+GoTMail 现在支持创建和管理多个临时邮箱账户（最多10个）：
+
+1. **创建新账户**：使用 `gotmail new` 创建新账户
+2. **查看所有账户**：使用 `gotmail list` 列出所有已创建的账户
+3. **账户特定操作**：大多数命令支持 `--id <account_id>` 参数来指定要操作的账户
+4. **向后兼容**：对于只有一个账户的情况，命令仍然可以不带 `--id` 参数使用
+
+当执行需要账户的操作时，如果存在多个账户，系统会提示您选择要使用的账户。
 
 ## 🐛 错误处理
 
 项目实现了完善的错误处理机制：
 
-- **网络错误** - 处理 API 连接失败
-- **文件操作错误** - 处理数据读写失败
-- **剪贴板错误** - 处理跨平台剪贴板操作失败
-- **API 响应错误** - 处理 API 返回的错误状态
+- **网络错误**：处理 API 连接失败
+- **文件操作错误**：处理数据读写失败
+- **剪贴板错误**：处理跨平台剪贴板操作失败
+- **API 响应错误**：处理 API 返回的错误状态
 
 ## 🤝 贡献指南
 

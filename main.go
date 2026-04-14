@@ -31,14 +31,30 @@ func main() {
 
 	command := os.Args[1]
 
+	// Parse account ID from arguments
+	accountID, hasAccountID := utils.ParseAccountID(os.Args)
+
 	switch command {
 	case "new":
 		if err := mailManager.CreateAccount(); err != nil {
 			log.Fatal("Error creating account:", err)
 		}
 
+	case "list":
+		if err := mailManager.ListAccounts(); err != nil {
+			log.Fatal("Error listing accounts:", err)
+		}
+
 	case "msg":
-		messages, err := mailManager.FetchMessages()
+		var messages []utils.Message
+		var err error
+
+		if hasAccountID {
+			messages, err = mailManager.FetchMessagesByAccountID(accountID)
+		} else {
+			messages, err = mailManager.FetchMessages()
+		}
+
 		if err != nil {
 			log.Fatal("Error fetching messages:", err)
 		}
@@ -50,13 +66,26 @@ func main() {
 		}
 
 	case "del":
-		if err := mailManager.DeleteAccount(); err != nil {
-			log.Fatal("Error deleting account:", err)
+		if hasAccountID {
+			if err := mailManager.DeleteAccountByID(accountID); err != nil {
+				log.Fatal("Error deleting account:", err)
+			}
+		} else {
+			if err := mailManager.DeleteAccount(); err != nil {
+				log.Fatal("Error deleting account:", err)
+			}
 		}
 
 	case "show":
-		if err := mailManager.ShowDetails(); err != nil {
-			log.Fatal("Error showing details:", err)
+		if hasAccountID {
+			if err := mailManager.ShowAccountDetails(accountID); err != nil {
+				log.Fatal("Error showing details:", err)
+			}
+		} else {
+			// Show all accounts if no ID specified
+			if err := mailManager.ListAccounts(); err != nil {
+				log.Fatal("Error showing accounts:", err)
+			}
 		}
 
 	case "open":
@@ -68,8 +97,14 @@ func main() {
 		if _, err := fmt.Sscanf(os.Args[2], "%d", &emailNum); err != nil {
 			log.Fatal("Invalid email number:", err)
 		}
-		if err := mailManager.OpenEmail(emailNum); err != nil {
-			log.Fatal("Error opening email:", err)
+		if hasAccountID {
+			if err := mailManager.OpenEmailByAccountID(accountID, emailNum); err != nil {
+				log.Fatal("Error opening email:", err)
+			}
+		} else {
+			if err := mailManager.OpenEmail(emailNum); err != nil {
+				log.Fatal("Error opening email:", err)
+			}
 		}
 
 	case "export":
@@ -78,8 +113,14 @@ func main() {
 			return
 		}
 		exportPath := os.Args[2]
-		if err := mailManager.ExportAccount(exportPath); err != nil {
-			log.Fatal("Error exporting account:", err)
+		if hasAccountID {
+			if err := mailManager.ExportAccountByID(accountID, exportPath); err != nil {
+				log.Fatal("Error exporting account:", err)
+			}
+		} else {
+			if err := mailManager.ExportAccount(exportPath); err != nil {
+				log.Fatal("Error exporting account:", err)
+			}
 		}
 
 	default:
@@ -91,16 +132,24 @@ func main() {
 func showHelp() {
 	fmt.Println("Mail.tm CLI Tool - Go Version")
 	fmt.Println("\nUsage:")
-	fmt.Println("  new             - Create a new account")
-	fmt.Println("  msg             - Fetch and list messages")
-	fmt.Println("  del             - Delete the account")
-	fmt.Println("  show            - Show account details")
-	fmt.Println("  open <number>   - Open specific email in browser")
-	fmt.Println("  export <path>   - Export account data to specified path")
+	fmt.Println("  new                           Create a new account")
+	fmt.Println("  list                          List all accounts")
+	fmt.Println("  msg [id <id>]                 Fetch and list messages")
+	fmt.Println("  del [id <id>]                 Delete account")
+	fmt.Println("  show [id <id>]                Show account details")
+	fmt.Println("  open <number> [id <id>]       Open specific email in browser")
+	fmt.Println("  export <path> [id <id>]       Export account data to specified path")
+	fmt.Println("\nOptions:")
+	fmt.Println("  id <id>                       Specify account ID for operations")
 	fmt.Println("\nExamples:")
-	fmt.Println("gotmail new")
-	fmt.Println("gotmail msg")
-	fmt.Println("gotmail show")
-	fmt.Println("gotmail open 1")
-	fmt.Println("gotmail export /path/to/account.json")
+	fmt.Println("  gotmail new")
+	fmt.Println("  gotmail list")
+	fmt.Println("  gotmail msg")
+	fmt.Println("  gotmail msg id abc123")
+	fmt.Println("  gotmail show")
+	fmt.Println("  gotmail show id abc123")
+	fmt.Println("  gotmail open 1")
+	fmt.Println("  gotmail open 1 id abc123")
+	fmt.Println("  gotmail export /path/to/backup")
+	fmt.Println("  gotmail export /path/to/backup id abc123")
 }

@@ -43,7 +43,7 @@ func (m *MailManager) CreateAccount() error {
 
 	// If account already exists
 	if m.db.GetData() != nil {
-		fmt.Printf("\r%s\n", m.color.Red("Account already exists"))
+		fmt.Printf("%s\n", m.color.Red("Account already exists"))
 		return nil
 	}
 
@@ -137,7 +137,7 @@ func (m *MailManager) FetchMessages() ([]Message, error) {
 
 	account := m.db.GetData()
 	if account == nil {
-		fmt.Printf("\r%s\n", m.color.Red("Account not created yet"))
+		fmt.Printf("%s\n", m.color.Red("Account not created yet"))
 		return nil, nil
 	}
 
@@ -147,7 +147,7 @@ func (m *MailManager) FetchMessages() ([]Message, error) {
 	}
 
 	if len(messages) == 0 {
-		fmt.Printf("\r%s\n", m.color.Red("No Emails"))
+		fmt.Printf("\r\033[K%s\n", m.color.Red("No Emails"))
 		return nil, nil
 	}
 
@@ -166,7 +166,7 @@ func (m *MailManager) DeleteAccount() error {
 
 	account := m.db.GetData()
 	if account == nil {
-		fmt.Printf("\r%s\n", m.color.Red("Account not created yet"))
+		fmt.Printf("%s\n", m.color.Red("Account not created yet"))
 		return nil
 	}
 
@@ -194,7 +194,7 @@ func (m *MailManager) ShowDetails() error {
 
 	account := m.db.GetData()
 	if account == nil {
-		fmt.Printf("\r%s\n", m.color.Red("Account not created yet"))
+		fmt.Printf("%s\n", m.color.Red("Account not created yet"))
 		return nil
 	}
 
@@ -242,7 +242,7 @@ func (m *MailManager) OpenEmail(emailIndex int) error {
 	}
 
 	if len(emailDetail.HTML) == 0 {
-		fmt.Printf("\r%s\n", m.color.Red("No HTML content found"))
+		fmt.Printf("%s\n", m.color.Red("No HTML content found"))
 		return nil
 	}
 

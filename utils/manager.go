@@ -205,7 +205,7 @@ func (m *MailManager) ShowDetails() error {
 
 	fmt.Printf("\n    Email: %s\n    createdAt: %s\n",
 		m.color.Underline(m.color.Green(details["address"].(string))),
-		m.color.Green(time.Now().Format("2006-01-02 15:04:05")))
+		m.color.Green(account.CreatedAt.Format("2006-01-02 15:04:05")))
 
 	return nil
 }

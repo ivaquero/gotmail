@@ -32,12 +32,12 @@ func main() {
 	command := os.Args[1]
 
 	switch command {
-	case "create":
+	case "new":
 		if err := mailManager.CreateAccount(); err != nil {
 			log.Fatal("Error creating account:", err)
 		}
 
-	case "messages":
+	case "msg":
 		messages, err := mailManager.FetchMessages()
 		if err != nil {
 			log.Fatal("Error fetching messages:", err)
@@ -49,7 +49,7 @@ func main() {
 			}
 		}
 
-	case "delete":
+	case "del":
 		if err := mailManager.DeleteAccount(); err != nil {
 			log.Fatal("Error deleting account:", err)
 		}
@@ -72,6 +72,16 @@ func main() {
 			log.Fatal("Error opening email:", err)
 		}
 
+	case "export":
+		if len(os.Args) < 3 {
+			fmt.Println("Please provide export path")
+			return
+		}
+		exportPath := os.Args[2]
+		if err := mailManager.ExportAccount(exportPath); err != nil {
+			log.Fatal("Error exporting account:", err)
+		}
+
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 		showHelp()
@@ -81,13 +91,15 @@ func main() {
 func showHelp() {
 	fmt.Println("Mail.tm CLI Tool - Go Version")
 	fmt.Println("\nUsage:")
-	fmt.Println("  create          - Create a new account")
-	fmt.Println("  messages        - Fetch and list messages")
-	fmt.Println("  delete          - Delete the account")
+	fmt.Println("  new             - Create a new account")
+	fmt.Println("  msg             - Fetch and list messages")
+	fmt.Println("  del             - Delete the account")
 	fmt.Println("  details         - Show account details")
 	fmt.Println("  open <number>   - Open specific email in browser")
+	fmt.Println("  export <path>   - Export account data to specified path")
 	fmt.Println("\nExamples:")
-	fmt.Println("gotmail create")
-	fmt.Println("gotmail messages")
+	fmt.Println("gotmail new")
+	fmt.Println("gotmail msg")
 	fmt.Println("gotmail open 1")
+	fmt.Println("gotmail export /path/to/account.json")
 }

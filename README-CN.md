@@ -11,6 +11,7 @@ GoTMail（Go Temporary Mail）是一个用 Go 语言编写的 [mail.tm](https://
 - **消息管理** - 获取和列出收到的邮件消息
 - **邮件查看** - 在浏览器中打开特定邮件
 - **账户管理** - 查看账户详情和删除账户
+- **数据导出** - 导出账户数据到指定路径
 - **跨平台支持** - 支持 Windows、macOS 和 Linux
 - **剪贴板集成** - 自动复制邮箱地址到剪贴板
 - **命令行界面** - 简单易用的 CLI 操作
@@ -44,13 +45,13 @@ go install github.com/ivaquero/gotmail
 创建新的临时邮箱账户：
 
 ```bash
-gotmail create
+gotmail new
 ```
 
 查看收到的邮件：
 
 ```bash
-gotmail messages
+gotmail msg
 ```
 
 在浏览器中打开特定邮件：
@@ -68,18 +69,25 @@ gotmail details
 删除账户：
 
 ```bash
-gotmail delete
+gotmail del
+```
+
+导出账户数据：
+
+```bash
+gotmail export /path/to/account.json
 ```
 
 ## 📖 命令说明
 
-|      命令       |          描述          |        示例        |
-| :-------------: | :--------------------: | :----------------: |
-|    `create`     |  创建新的临时邮箱账户  |  `gotmail create`  |
-|   `messages`    |   获取并列出所有邮件   | `gotmail messages` |
-| `open <number>` | 在浏览器中打开指定邮件 |  `gotmail open 1`  |
-|    `details`    |    显示当前账户详情    | `gotmail details`  |
-|    `delete`     |      删除当前账户      |  `gotmail delete`  |
+|      命令       |          描述          |                 示例                 |
+| :-------------: | :--------------------: | :----------------------------------: |
+|      `new`      |  创建新的临时邮箱账户  |            `gotmail new`             |
+|      `msg`      |   获取并列出所有邮件   |            `gotmail msg`             |
+| `open <number>` | 在浏览器中打开指定邮件 |           `gotmail open 1`           |
+|    `details`    |    显示当前账户详情    |          `gotmail details`           |
+|      `del`      |      删除当前账户      |            `gotmail del`             |
+| `export <path>` | 导出账户数据到指定路径 | `gotmail export backup/account.json` |
 
 ## 🔧 开发指南
 
@@ -133,6 +141,16 @@ go test ./tests/... -v
 - **文件路径**: `<执行目录>/data/account.json`
 - **数据格式**: JSON
 - **包含信息**: 账户 ID、邮箱地址、密码、认证令牌
+
+### 数据导出
+
+您可以使用 `export` 命令将账户数据导出到任意指定路径：
+
+```bash
+gotmail export /path/to/backup/account.json
+```
+
+导出的文件将是原始账户数据文件的完整副本，保留所有账户信息和格式。
 
 ## 🐛 错误处理
 

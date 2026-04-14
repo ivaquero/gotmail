@@ -93,6 +93,38 @@ func (m *MailManager) CreateAccount() error {
 	return nil
 }
 
+// ExportAccount exports account data to specified path
+func (m *MailManager) ExportAccount(exportPath string) error {
+	if err := m.db.Read(); err != nil {
+		return fmt.Errorf("failed to read database: %w", err)
+	}
+
+	account := m.db.GetData()
+	if account == nil {
+		return fmt.Errorf("account not created yet")
+	}
+
+	// Ensure export directory exists
+	dir := filepath.Dir(exportPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create export directory: %w", err)
+	}
+
+	// Read the original account file
+	originalData, err := os.ReadFile(m.db.dataPath)
+	if err != nil {
+		return fmt.Errorf("failed to read original account file: %w", err)
+	}
+
+	// Write to export path
+	if err := os.WriteFile(exportPath, originalData, 0644); err != nil {
+		return fmt.Errorf("failed to write export file: %w", err)
+	}
+
+	fmt.Printf("Account data exported to: %s\n", exportPath)
+	return nil
+}
+
 // FetchMessages fetches email messages
 func (m *MailManager) FetchMessages() ([]Message, error) {
 	spinner := NewSpinner("fetching...")

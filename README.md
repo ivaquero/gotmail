@@ -15,6 +15,7 @@ GoTMail (Go Temporary Mail) is temporary email CLI tool written in Go for [mail.
 - **Message Management** - Fetch and list received email messages
 - **Email Viewing** - Open specific emails in your browser
 - **Account Management** - View account details and delete accounts
+- **Data Export** - Export account data to specified paths
 - **Cross-platform Support** - Support for Windows, macOS, and Linux
 - **Clipboard Integration** - Automatically copy email addresses to clipboard
 - **Command Line Interface** - Simple and easy-to-use CLI operations
@@ -48,13 +49,13 @@ go install github.com/ivaquero/gotmail
 Create a new temporary email account:
 
 ```bash
-gotmail create
+gotmail new
 ```
 
 View received emails:
 
 ```bash
-gotmail messages
+gotmail msg
 ```
 
 Open a specific email in your browser:
@@ -72,18 +73,25 @@ gotmail details
 Delete account:
 
 ```bash
-gotmail delete
+gotmail del
+```
+
+Export account data:
+
+```bash
+gotmail export /path/to/account.json
 ```
 
 ## 📖 Command Reference
 
-|     Command     |             Description              |      Example       |
-| :-------------: | :----------------------------------: | :----------------: |
-|    `create`     | Create a new temporary email account |  `gotmail create`  |
-|   `messages`    |      Fetch and list all emails       | `gotmail messages` |
-| `open <number>` |   Open specified email in browser    |  `gotmail open 1`  |
-|    `details`    |   Display current account details    | `gotmail details`  |
-|    `delete`     |        Delete current account        |  `gotmail delete`  |
+|     Command     |              Description              |               Example                |
+| :-------------: | :-----------------------------------: | :----------------------------------: |
+|      `new`      | Create a new temporary email account  |            `gotmail new`             |
+|      `msg`      |       Fetch and list all emails       |            `gotmail msg`             |
+| `open <number>` |    Open specified email in browser    |           `gotmail open 1`           |
+|    `details`    |    Display current account details    |          `gotmail details`           |
+|      `del`      |        Delete current account         |            `gotmail del`             |
+| `export <path>` | Export account data to specified path | `gotmail export backup/account.json` |
 
 ## 🔧 Development Guide
 
@@ -137,6 +145,16 @@ Account data is stored in a local file:
 - **File Path**: `<execution directory>/data/account.json`
 - **Data Format**: JSON
 - **Contains**: Account ID, email address, password, authentication token
+
+### Data Export
+
+You can export account data to any specified path using the `export` command:
+
+```bash
+gotmail export /path/to/backup/account.json
+```
+
+The exported file will be an exact copy of the original account data file, preserving all account information and formatting.
 
 ## 🐛 Error Handling
 

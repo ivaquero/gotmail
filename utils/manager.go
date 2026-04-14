@@ -47,7 +47,7 @@ func (m *MailManager) CreateAccount() error {
 		return nil
 	}
 
-	// 获取可用域名
+	// Get available domain
 	domain, err := m.getDomain()
 	if err != nil {
 		return fmt.Errorf("failed to get domain: %w", err)
@@ -252,7 +252,7 @@ func (m *MailManager) getDomain() (string, error) {
 	return domainResp.HydraMember[0].Domain, nil
 }
 
-// createAccountAPI 调用API创建账户
+// createAccountAPI calls API to create account
 func (m *MailManager) createAccountAPI(email, password string) (map[string]interface{}, error) {
 	payload := map[string]string{
 		"address":  email,
@@ -278,7 +278,7 @@ func (m *MailManager) createAccountAPI(email, password string) (map[string]inter
 	return result, nil
 }
 
-// getToken 获取JWT令牌
+// getToken gets JWT token
 func (m *MailManager) getToken(email, password string) (map[string]interface{}, error) {
 	payload := map[string]string{
 		"address":  email,
@@ -304,7 +304,7 @@ func (m *MailManager) getToken(email, password string) (map[string]interface{}, 
 	return result, nil
 }
 
-// fetchMessagesAPI 获取邮件消息API
+// fetchMessagesAPI fetches email messages API
 func (m *MailManager) fetchMessagesAPI(token string) ([]Message, error) {
 	req, err := http.NewRequest("GET", "https://api.mail.tm/messages", nil)
 	if err != nil {
@@ -327,7 +327,7 @@ func (m *MailManager) fetchMessagesAPI(token string) ([]Message, error) {
 	return msgResp.HydraMember, nil
 }
 
-// deleteAccountAPI 删除账户API
+// deleteAccountAPI deletes account API
 func (m *MailManager) deleteAccountAPI(accountID, token string) error {
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("https://api.mail.tm/accounts/%s", accountID), nil)
 	if err != nil {
@@ -349,7 +349,7 @@ func (m *MailManager) deleteAccountAPI(accountID, token string) error {
 	return nil
 }
 
-// getAccountDetailsAPI 获取账户详情API
+// getAccountDetailsAPI gets account details API
 func (m *MailManager) getAccountDetailsAPI(accountID, token string) (map[string]interface{}, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.mail.tm/accounts/%s", accountID), nil)
 	if err != nil {
@@ -372,7 +372,7 @@ func (m *MailManager) getAccountDetailsAPI(accountID, token string) (map[string]
 	return result, nil
 }
 
-// getEmailDetailAPI 获取邮件详情API
+// getEmailDetailAPI gets email detail API
 func (m *MailManager) getEmailDetailAPI(messageID, token string) (*EmailDetail, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.mail.tm/messages/%s", messageID), nil)
 	if err != nil {
@@ -395,7 +395,7 @@ func (m *MailManager) getEmailDetailAPI(messageID, token string) (*EmailDetail, 
 	return &result, nil
 }
 
-// getCurrentDir 获取当前执行目录
+// getCurrentDir gets current execution directory
 func getCurrentDir() string {
 	ex, err := os.Executable()
 	if err != nil {
@@ -404,7 +404,7 @@ func getCurrentDir() string {
 	return filepath.Dir(ex)
 }
 
-// openInBrowser 在浏览器中打开文件
+// openInBrowser opens file in browser
 func openInBrowser(filePath string) error {
 	var cmd string
 	var args []string

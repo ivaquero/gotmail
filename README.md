@@ -28,7 +28,7 @@ scoop bucket add scoopforge/main-plus
 scoop install gotmail
 ```
 
-- macOS 和 Linux
+- macOS and Linux
 
 ```bash
 brew tap brewforge/more

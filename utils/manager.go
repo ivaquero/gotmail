@@ -93,8 +93,8 @@ func (m *MailManager) CreateAccount() error {
 	return nil
 }
 
-// ExportAccount exports account data to specified path
-func (m *MailManager) ExportAccount(exportPath string) error {
+// ExportAccount exports account data to specified folder
+func (m *MailManager) ExportAccount(exportFolder string) error {
 	if err := m.db.Read(); err != nil {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
@@ -105,10 +105,13 @@ func (m *MailManager) ExportAccount(exportPath string) error {
 	}
 
 	// Ensure export directory exists
-	dir := filepath.Dir(exportPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(exportFolder, 0755); err != nil {
 		return fmt.Errorf("failed to create export directory: %w", err)
 	}
+
+	// Generate default filename with timestamp
+
+	exportPath := filepath.Join(exportFolder, "accounts.json")
 
 	// Read the original account file
 	originalData, err := os.ReadFile(m.db.dataPath)

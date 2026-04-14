@@ -18,7 +18,7 @@ func main() {
 	execDir := filepath.Dir(execPath)
 
 	// Set data file path
-	dataPath := filepath.Join(execDir, "data", "account.json")
+	dataPath := filepath.Join(execDir, "accounts.json")
 
 	// Create mail manager
 	mailManager := utils.NewMailManager(dataPath)

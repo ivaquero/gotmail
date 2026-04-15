@@ -12,11 +12,11 @@ import (
 
 func main() {
 	// Get current executable directory
-	execPath, err := os.Executable()
+	// Get current working directory
+	execDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal("Failed to get executable path:", err)
+		log.Fatal("Failed to get working directory:", err)
 	}
-	execDir := filepath.Dir(execPath)
 
 	// Set data file path
 	dataPath := filepath.Join(execDir, "accounts.json")
@@ -56,7 +56,7 @@ func main() {
 	switch command {
 	case "new":
 		if err := mailManager.CreateAccount(); err != nil {
-			log.Fatal("Error creating account:", err)
+			log.Fatal("Error creating account: ", err)
 		}
 
 	case "ls":
@@ -75,7 +75,7 @@ func main() {
 		}
 
 		if err != nil {
-			log.Fatal("Error fetching messages:", err)
+			log.Fatal("\nError fetching messages: ", err)
 		}
 		if messages != nil {
 			fmt.Println("Messages:")
@@ -87,11 +87,11 @@ func main() {
 	case "del":
 		if hasAccountID {
 			if err := mailManager.DeleteAccountByID(accountID); err != nil {
-				log.Fatal("Error deleting account:", err)
+				log.Fatal("Error deleting account: ", err)
 			}
 		} else {
 			if err := mailManager.DeleteAccount(); err != nil {
-				log.Fatal("Error deleting account:", err)
+				log.Fatal("Error deleting account: ", err)
 			}
 		}
 
@@ -144,11 +144,11 @@ func main() {
 		exportFolder := remainingArgs[0]
 		if hasAccountID {
 			if err := mailManager.ExportAccountByID(accountID, exportFolder); err != nil {
-				log.Fatal("Error exporting account:", err)
+				log.Fatal("Error exporting account: ", err)
 			}
 		} else {
 			if err := mailManager.ExportAccount(exportFolder); err != nil {
-				log.Fatal("Error exporting account:", err)
+				log.Fatal("Error exporting account: ", err)
 			}
 		}
 

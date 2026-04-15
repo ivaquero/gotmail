@@ -38,8 +38,14 @@ type DomainResponse struct {
 // Message email message data structure
 type Message struct {
 	ID   string `json:"id"`
-	From string `json:"from"`
-	To   string `json:"to"`
+	From struct {
+		Address string `json:"address"`
+		Name    string `json:"name"`
+	} `json:"from"`
+	To []struct {
+		Address string `json:"address"`
+		Name    string `json:"name"`
+	} `json:"to"`
 }
 
 // MessageResponse API message response
@@ -323,6 +329,7 @@ func SelectAccount(accounts map[string]*Account) (*Account, error) {
 
 	var selectedID string
 	fmt.Scanln(&selectedID)
+	selectedID = strings.TrimSpace(selectedID)
 
 	account, exists := accounts[selectedID]
 	if !exists {

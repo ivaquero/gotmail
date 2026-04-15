@@ -278,7 +278,7 @@ func (m *MailManager) DeleteAccountByID(accountID string) error {
 		return fmt.Errorf("failed to save database: %w", err)
 	}
 
-	fmt.Printf("\r%s\n", m.color.Blue("Account deleted"))
+	fmt.Printf("%s\n", m.color.Blue("Account deleted"))
 	return nil
 }
 
@@ -320,10 +320,6 @@ func (m *MailManager) FetchMessages() ([]Message, error) {
 
 // DeleteAccount deletes the first account (backward compatibility)
 func (m *MailManager) DeleteAccount() error {
-	spinner := NewSpinner("deleting...")
-	spinner.Start()
-	defer spinner.Stop()
-
 	if err := m.db.Read(); err != nil {
 		return fmt.Errorf("failed to read database: %w", err)
 	}
@@ -334,13 +330,23 @@ func (m *MailManager) DeleteAccount() error {
 		return nil
 	}
 
-	// Get first account for backward compatibility
-	var account *Account
+	// Use interactive selection like SelectAccount
+	account, err := SelectAccount(accounts)
+	if err != nil {
+		return err
+	}
+
+	spinner := NewSpinner("deleting...")
+	spinner.Start()
+	defer spinner.Stop()
+
+	// Find the account ID from the map
 	var accountID string
 	for id, acc := range accounts {
-		account = acc
-		accountID = id
-		break
+		if acc == account {
+			accountID = id
+			break
+		}
 	}
 
 	if err := m.deleteAccountAPI(account.ID, account.Token.Token); err != nil {
@@ -355,7 +361,7 @@ func (m *MailManager) DeleteAccount() error {
 		return fmt.Errorf("failed to save database: %w", err)
 	}
 
-	fmt.Printf("\r%s\n", m.color.Blue("Account deleted"))
+	fmt.Printf("%s\n", m.color.Blue("Account deleted"))
 	return nil
 }
 

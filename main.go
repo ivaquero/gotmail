@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -31,8 +32,26 @@ func main() {
 
 	command := os.Args[1]
 
-	// Parse account ID from arguments
-	accountID, hasAccountID := utils.ParseAccountID(os.Args)
+	// Parse flags
+	var accountID string
+	var hasAccountID bool
+
+	// Create a new flag set for parsing command-specific flags
+	fs := flag.NewFlagSet(command, flag.ContinueOnError)
+	fs.StringVar(&accountID, "id", "", "Account ID for operations")
+
+	// Parse flags from os.Args[2:] (skip command name)
+	if len(os.Args) > 2 {
+		if err := fs.Parse(os.Args[2:]); err != nil {
+			fmt.Printf("Error parsing flags: %v\n", err)
+			showHelp()
+			return
+		}
+	}
+
+	if accountID != "" {
+		hasAccountID = true
+	}
 
 	switch command {
 	case "new":
@@ -89,14 +108,19 @@ func main() {
 		}
 
 	case "open":
-		if len(os.Args) < 3 {
+		// Parse remaining arguments for open command
+		var emailNum int
+		remainingArgs := fs.Args()
+
+		if len(remainingArgs) < 1 {
 			fmt.Println("Please provide email number to open")
 			return
 		}
-		var emailNum int
-		if _, err := fmt.Sscanf(os.Args[2], "%d", &emailNum); err != nil {
+
+		if _, err := fmt.Sscanf(remainingArgs[0], "%d", &emailNum); err != nil {
 			log.Fatal("Invalid email number:", err)
 		}
+
 		if hasAccountID {
 			if err := mailManager.OpenEmailByAccountID(accountID, emailNum); err != nil {
 				log.Fatal("Error opening email:", err)
@@ -108,11 +132,12 @@ func main() {
 		}
 
 	case "export":
-		if len(os.Args) < 3 {
+		remainingArgs := fs.Args()
+		if len(remainingArgs) < 1 {
 			fmt.Println("Please provide export path")
 			return
 		}
-		exportPath := os.Args[2]
+		exportPath := remainingArgs[0]
 		if hasAccountID {
 			if err := mailManager.ExportAccountByID(accountID, exportPath); err != nil {
 				log.Fatal("Error exporting account:", err)
@@ -141,14 +166,14 @@ func showHelp() {
 	fmt.Println("\nUsage:")
 	fmt.Println("  new                           Create a new account")
 	fmt.Println("  ls                            List all accounts")
-	fmt.Println("  msg [id <id>]                 Fetch and list messages")
-	fmt.Println("  del [id <id>]                 Delete account")
-	fmt.Println("  show [id <id>]                Show account details")
-	fmt.Println("  open <number> [id <id>]       Open specific email in browser")
-	fmt.Println("  export <path> [id <id>]       Export account data to specified path")
+	fmt.Println("  msg [--id <id>]               Fetch and list messages")
+	fmt.Println("  del [--id <id>]               Delete account")
+	fmt.Println("  show [--id <id>]              Show account details")
+	fmt.Println("  open <number> [--id <id>]     Open specific email in browser")
+	fmt.Println("  export <path> [--id <id>]     Export account data to specified path")
 	fmt.Println("  help                          Show this help message")
 	fmt.Println("\nOptions:")
-	fmt.Println("  id <id>                       Specify account ID for operations")
+	fmt.Println("  --id <id>                     Specify account ID for operations")
 }
 
 func showCommandHelp(command string) {
@@ -171,52 +196,52 @@ func showCommandHelp(command string) {
 	case "msg":
 		fmt.Println("Fetch and list messages")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail msg [id <account_id>]")
+		fmt.Println("  gotmail msg [--id <account_id>]")
 		fmt.Println("\nDescription:")
 		fmt.Println("  Retrieves messages from the specified account or the default account")
 		fmt.Println("\nExamples:")
 		fmt.Println("  gotmail msg                    # Fetch from default account")
-		fmt.Println("  gotmail msg id abc123          # Fetch from specific account")
+		fmt.Println("  gotmail msg --id abc123        # Fetch from specific account")
 
 	case "del":
 		fmt.Println("Delete account")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail del [id <account_id>]")
+		fmt.Println("  gotmail del [--id <account_id>]")
 		fmt.Println("\nDescription:")
 		fmt.Println("  Removes the specified account or the default account from storage")
 		fmt.Println("\nExamples:")
 		fmt.Println("  gotmail del                    # Delete default account")
-		fmt.Println("  gotmail del id abc123          # Delete specific account")
+		fmt.Println("  gotmail del --id abc123        # Delete specific account")
 
 	case "show":
 		fmt.Println("Show account details")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail show [id <account_id>]")
+		fmt.Println("  gotmail show [--id <account_id>]")
 		fmt.Println("\nDescription:")
 		fmt.Println("  Displays detailed information about the specified account")
 		fmt.Println("\nExamples:")
 		fmt.Println("  gotmail show                   # Show default account")
-		fmt.Println("  gotmail show id abc123         # Show specific account")
+		fmt.Println("  gotmail show --id abc123       # Show specific account")
 
 	case "open":
 		fmt.Println("Open specific email in browser")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail open <number> [id <account_id>]")
+		fmt.Println("  gotmail open <number> [--id <account_id>]")
 		fmt.Println("\nDescription:")
 		fmt.Println("  Opens the specified email message in your default web browser")
 		fmt.Println("\nExamples:")
 		fmt.Println("  gotmail open 1                 # Open first message from default account")
-		fmt.Println("  gotmail open 3 id abc123       # Open third message from specific account")
+		fmt.Println("  gotmail open 3 --id abc123     # Open third message from specific account")
 
 	case "export":
 		fmt.Println("Export account data to specified path")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail export <path> [id <account_id>]")
+		fmt.Println("  gotmail export <path> [--id <account_id>]")
 		fmt.Println("\nDescription:")
 		fmt.Println("  Exports account data to the specified file path")
 		fmt.Println("\nExamples:")
 		fmt.Println("  gotmail export /tmp/backup.json          # Export default account")
-		fmt.Println("  gotmail export /tmp/backup.json id abc123 # Export specific account")
+		fmt.Println("  gotmail export /tmp/backup.json --id abc123 # Export specific account")
 
 	case "help":
 		fmt.Println("Show help information")

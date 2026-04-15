@@ -111,7 +111,32 @@ gotmail show --id abc123
 
 # Delete a specific account
 gotmail del --id abc123
+
+# Open specific email from specific account
+gotmail open 1 --id abc123
+
+# Export specific account data
+gotmail export ./backup --id abc123
 ```
+
+## 📖 Command Reference
+
+| Command                   | Description                                    | Example                              |
+| ------------------------- | ---------------------------------------------- | ------------------------------------ |
+| `new`                     | Create a new temporary email account           | `gotmail new`                        |
+| `ls`                      | List all accounts                              | `gotmail ls`                         |
+| `msg`                     | Fetch and list all emails                      | `gotmail msg`                        |
+| `msg --id <id>`           | Fetch emails for a specific account            | `gotmail msg --id abc123`            |
+| `open <number>`           | Open specified email in browser                | `gotmail open 1`                     |
+| `open <number> --id <id>` | Open specified email for specific account      | `gotmail open 1 --id abc123`         |
+| `show`                    | Display current account details                | `gotmail show`                       |
+| `show --id <id>`          | Display specific account details               | `gotmail show --id abc123`           |
+| `del`                     | Delete current account                         | `gotmail del`                        |
+| `del --id <id>`           | Delete specific account                        | `gotmail del --id abc123`            |
+| `export <path>`           | Export all account data to specified path      | `gotmail export backup/account.json` |
+| `export <path> --id <id>` | Export specific account data to specified path | `gotmail export backup/ --id abc123` |
+| `help`                    | Show help information                          | `gotmail help`                       |
+| `help <command>`          | Show detailed help for specific command        | `gotmail help msg`                   |
 
 ## 🔧 Development Guide
 
@@ -186,7 +211,7 @@ The exported file will be an exact copy of the original account data file, prese
 GoTMail now supports creating and managing multiple temporary email accounts (up to 10):
 
 1. **Create New Account**: Use `gotmail new` to create a new account
-2. **View All Accounts**: Use `gotmail list` to list all created accounts
+2. **View All Accounts**: Use `gotmail ls` to list all created accounts
 3. **Account-Specific Operations**: Most commands support the `--id <account_id>` parameter to specify which account to operate on
 4. **Backward Compatibility**: For single-account scenarios, commands can still be used without the `--id` parameter
 

@@ -40,6 +40,8 @@ brew tap brewforge/more
 brew install gotmail
 ```
 
+> After installation, run `xattr -r -d com.apple.quarantine $HOMEBREW_PREFIX/bin/gotmail` to allow execution.
+
 - Alternative method (requires Go 1.18 or higher)
 
 ```bash

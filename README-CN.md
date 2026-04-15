@@ -36,6 +36,8 @@ brew tap brewforge/more
 brew install gotmail
 ```
 
+> 安装完成后，运行 `xattr -r -d com.apple.quarantine $HOMEBREW_PREFIX/bin/gotmail` 以允许执行。
+
 - 备选方法（需要 Go 1.18 或更高版本）
 
 ```bash

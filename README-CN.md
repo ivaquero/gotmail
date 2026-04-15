@@ -2,8 +2,12 @@
 
 [![Go Version](https://img.shields.io/badge/go-1.18+-blue.svg)](https://golang.org/doc/go1.18)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ivaquero/gotmail)](https://goreportcard.com/report/github.com/ivaquero/gotmail)
+![code size](https://img.shields.io/github/languages/code-size/ivaquero/gotmail.svg)
+![repo size](https://img.shields.io/github/repo-size/ivaquero/gotmail.svg)
 
 GoTMail（Go Temporary Mail）是一个用 Go 语言编写的 [mail.tm](https://mail.tm/) 临时邮箱 CLI 工具，提供跨平台的临时邮箱管理功能。
+
+**[English](README.md)**
 
 ## 🌟 功能特性
 
@@ -46,6 +50,8 @@ go install github.com/ivaquero/gotmail
 
 ### 基本用法
 
+#### 账户管理
+
 创建新的临时邮箱账户：
 
 ```bash
@@ -58,16 +64,24 @@ gotmail new
 gotmail ls
 ```
 
+查看账户信息：
+
+```bash
+gotmail show
+```
+
+删除账户：
+
+```bash
+gotmail del
+```
+
+#### 消息管理
+
 查看收到的邮件：
 
 ```bash
 gotmail msg
-```
-
-查看指定账户的邮件：
-
-```bash
-gotmail msg --id abc123
 ```
 
 在浏览器中打开特定邮件：
@@ -76,47 +90,53 @@ gotmail msg --id abc123
 gotmail open 1
 ```
 
-打开指定账户的邮件：
+#### 数据管理
 
-```bash
-gotmail open 1 --id abc123
-```
-
-查看账户信息：
-
-```bash
-gotmail show
-```
-
-查看指定账户信息：
-
-```bash
-gotmail show --id abc123
-```
-
-删除当前账户：
-
-```bash
-gotmail del
-```
-
-删除指定账户：
-
-```bash
-gotmail del --id abc123
-```
-
-导出所有账户数据：
+导出账户数据：
 
 ```bash
 gotmail export /备份文件夹/
 ```
 
-导出指定账户数据：
+#### 多账户操作
+
+对于多账户场景，大多数命令支持 `--id` 参数来指定特定账户：
 
 ```bash
-gotmail export /备份文件夹/ --id abc123
+# 查看指定账户的邮件
+gotmail msg --id abc123
+
+# 查看指定账户信息
+gotmail show --id abc123
+
+# 删除指定账户
+gotmail del --id abc123
+
+# 从指定账户打开特定邮件
+gotmail open 1 --id abc123
+
+# 导出指定账户数据
+gotmail export ./备份文件夹 --id abc123
 ```
+
+## 📖 命令参考
+
+| 命令                        | 描述                         | 示例                                       |
+| --------------------------- | ---------------------------- | ------------------------------------------ |
+| `new`                       | 创建新的临时邮箱账户         | `gotmail new`                              |
+| `ls`                        | 列出所有账户                 | `gotmail ls`                               |
+| `msg`                       | 获取并列出所有邮件           | `gotmail msg`                              |
+| `msg --id <id>`             | 获取指定账户的邮件           | `gotmail msg --id abc123`                  |
+| `open <number>`             | 在浏览器中打开指定邮件       | `gotmail open 1`                           |
+| `open <number> --id <id>`   | 为指定账户打开指定邮件       | `gotmail open 1 --id abc123`               |
+| `show`                      | 显示当前账户详情             | `gotmail show`                             |
+| `show --id <id>`            | 显示指定账户详情             | `gotmail show --id abc123`                 |
+| `del`                       | 删除当前账户                 | `gotmail del`                              |
+| `del --id <id>`             | 删除指定账户                 | `gotmail del --id abc123`                  |
+| `export <folder>`           | 导出所有账户数据到指定文件夹 | `gotmail export backup/folder`             |
+| `export <folder> --id <id>` | 导出指定账户数据到指定文件夹 | `gotmail export backup/folder --id abc123` |
+| `help`                      | 显示帮助信息                 | `gotmail help`                             |
+| `help <command>`            | 显示特定命令的详细帮助       | `gotmail help msg`                         |
 
 ## 🔧 开发指南
 
@@ -165,9 +185,10 @@ go test ./tests/... -v
 
 账户数据存储在本地文件中：
 
-- **文件路径**: `<执行目录>/data/account.json`
+- **文件路径**: `accounts.json`
 - **数据格式**: JSON
-- **包含信息**: 账户 ID、邮箱地址、密码、认证令牌
+- **包含信息**: 多个账户的 ID、邮箱地址、密码、认证令牌
+- **向后兼容**: 自动转换旧的单账户文件格式
 
 ### 数据导出
 

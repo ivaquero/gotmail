@@ -163,6 +163,26 @@ func (m *MailManager) ExportAccountByID(accountID string, exportFolder string) e
 	return nil
 }
 
+// GetAllAccountsJSON returns all accounts data as JSON string
+func (m *MailManager) GetAllAccountsJSON() (string, error) {
+	if err := m.db.Read(); err != nil {
+		return "", fmt.Errorf("failed to read database: %w", err)
+	}
+
+	accounts := m.db.GetData()
+	if len(accounts) == 0 {
+		return "[]", nil
+	}
+
+	// Convert accounts to JSON
+	jsonData, err := json.MarshalIndent(accounts, "", "  ")
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal accounts data: %w", err)
+	}
+
+	return string(jsonData), nil
+}
+
 // ListAccounts lists all accounts
 func (m *MailManager) ListAccounts() error {
 	if err := m.db.Read(); err != nil {

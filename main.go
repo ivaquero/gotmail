@@ -97,14 +97,18 @@ func main() {
 
 	case "show":
 		if hasAccountID {
+			// 指定 id 时，显示 accounts.json 中的 id 对应信息
 			if err := mailManager.ShowAccountDetails(accountID); err != nil {
 				log.Fatal("Error showing details:", err)
 			}
 		} else {
-			// Show all accounts if no ID specified
-			if err := mailManager.ListAccounts(); err != nil {
-				log.Fatal("Error showing accounts:", err)
+			// 未指定 id 时，打印整个 accounts.json
+			jsonData, err := mailManager.GetAllAccountsJSON()
+			if err != nil {
+				log.Fatal("Error getting accounts JSON:", err)
 			}
+
+			fmt.Println(jsonData)
 		}
 
 	case "open":
@@ -168,7 +172,7 @@ func showHelp() {
 	fmt.Println("  ls                            List all accounts")
 	fmt.Println("  msg [--id <id>]               Fetch and list messages")
 	fmt.Println("  del [--id <id>]               Delete account")
-	fmt.Println("  show [--id <id>]              Show account details")
+	fmt.Println("  show [--id <id>]              Show account details or all accounts in JSON")
 	fmt.Println("  open <number> [--id <id>]     Open specific email in browser")
 	fmt.Println("  export <folder> [--id <id>]   Export account data to specified folder")
 	fmt.Println("  help                          Show this help message")
@@ -214,14 +218,15 @@ func showCommandHelp(command string) {
 		fmt.Println("  gotmail del --id abc123        # Delete specific account")
 
 	case "show":
-		fmt.Println("Show account details")
+		fmt.Println("Show account details or all accounts")
 		fmt.Println("\nUsage:")
 		fmt.Println("  gotmail show [--id <account_id>]")
 		fmt.Println("\nDescription:")
-		fmt.Println("  Displays detailed information about the specified account")
+		fmt.Println("  When --id is specified, shows detailed information about the specific account")
+		fmt.Println("  When --id is not specified, shows all accounts data in JSON format")
 		fmt.Println("\nExamples:")
-		fmt.Println("  gotmail show                   # Show default account")
-		fmt.Println("  gotmail show --id abc123       # Show specific account")
+		fmt.Println("  gotmail show                   # Show all accounts in JSON format")
+		fmt.Println("  gotmail show --id abc123       # Show specific account details")
 
 	case "open":
 		fmt.Println("Open specific email in browser")

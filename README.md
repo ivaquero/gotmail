@@ -12,7 +12,7 @@ GoTMail (Go Temporary Mail) is temporary email CLI tool written in Go for [mail.
 ## 🌟 Features
 
 - **Multi-Account Management**: Support creating and managing multiple temporary email accounts (up to 10)
-- **Temporary Email Creation**: Quickly create Mail.tm temporary email accounts
+- **Temporary Email Creation**: Quickly create temporary email accounts
 - **Message Management**: Fetch and list received email messages
 - **Email Viewing**: Open specific emails in your browser
 - **Account Management**: View account details and delete accounts
@@ -48,22 +48,18 @@ go install github.com/ivaquero/gotmail
 
 ### Basic Usage
 
+#### Account Management
+
 Create a new temporary email account:
 
 ```bash
 gotmail new
 ```
 
-View received emails:
+List all accounts:
 
 ```bash
-gotmail msg
-```
-
-Open a specific email in your browser:
-
-```bash
-gotmail open 1
+gotmail ls
 ```
 
 View account details:
@@ -78,36 +74,48 @@ Delete account:
 gotmail del
 ```
 
+#### Message Management
+
+View received emails:
+
+```bash
+gotmail msg
+```
+
+Open a specific email in your browser:
+
+```bash
+gotmail open 1
+```
+
+#### Data Management
+
 Export account data:
 
 ```bash
-gotmail export /backup path/
+gotmail export /backup/path/
 ```
 
-## 📖 Command Reference
+#### Multi-Account Operations
 
-|          Command          |                  Description                   |               Example                |
-| :-----------------------: | :--------------------------------------------: | :----------------------------------: |
-|           `new`           |      Create a new temporary email account      |            `gotmail new`             |
-|          `list`           |          List all account information          |            `gotmail list`            |
-|           `msg`           |           Fetch and list all emails            |            `gotmail msg`             |
-|      `msg --id <id>`      |      Fetch emails for a specific account       |      `gotmail msg --id abc123`       |
-|      `open <number>`      |        Open specified email in browser         |           `gotmail open 1`           |
-| `open <number> --id <id>` |   Open specified email for specific account    |     `gotmail open 1 --id abc123`     |
-|          `show`           |          Display current account show          |            `gotmail show`            |
-|        `show --id`        |         Display specific account show          |      `gotmail show --id abc123`      |
-|           `del`           |             Delete current account             |            `gotmail del`             |
-|        `del --id`         |            Delete specific account             |      `gotmail del --id abc123`       |
-|      `export <path>`      |   Export all account data to specified path    | `gotmail export backup/account.json` |
-| `export <path> --id <id>` | Export specific account data to specified path | `gotmail export backup/ --id abc123` |
+For multi-account scenarios, most commands support the `--id` parameter to specify a particular account:
+
+```bash
+# View emails for a specific account
+gotmail msg --id abc123
+
+# View details for a specific account
+gotmail show --id abc123
+
+# Delete a specific account
+gotmail del --id abc123
+```
 
 ## 🔧 Development Guide
 
 ### Requirements
 
 - Go 1.18 or higher
-- Network connection (for Mail.tm API)
-- Supported browser (for opening emails)
 
 ### Building the Project
 

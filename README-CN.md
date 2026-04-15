@@ -8,7 +8,7 @@ GoTMail（Go Temporary Mail）是一个用 Go 语言编写的 [mail.tm](https://
 ## 🌟 功能特性
 
 - **多账户管理**：支持创建和管理多个临时邮箱账户（最多10个）
-- **临时邮箱创建**：快速创建 Mail.tm 临时邮箱账户
+- **临时邮箱创建**：快速创建临时邮箱账户
 - **消息管理**：获取和列出收到的邮件消息
 - **邮件查看**：在浏览器中打开特定邮件
 - **账户管理**：查看账户详情和删除账户
@@ -53,7 +53,7 @@ gotmail new
 列出所有账户：
 
 ```bash
-gotmail list
+gotmail ls
 ```
 
 查看收到的邮件：
@@ -116,30 +116,11 @@ gotmail export /备份文件夹/
 gotmail export /备份文件夹/ --id abc123
 ```
 
-## 📖 命令说明
-
-|           命令            |            描述            |                 示例                 |
-| :-----------------------: | :------------------------: | :----------------------------------: |
-|           `new`           |    创建新的临时邮箱账户    |            `gotmail new`             |
-|          `list`           |      列出所有账户信息      |            `gotmail list`            |
-|           `msg`           |     获取并列出所有邮件     |            `gotmail msg`             |
-|      `msg --id <id>`      |   获取指定账户的所有邮件   |      `gotmail msg --id abc123`       |
-|      `open <number>`      |   在浏览器中打开指定邮件   |           `gotmail open 1`           |
-| `open <number> --id <id>` |   打开指定账户的指定邮件   |     `gotmail open 1 --id abc123`     |
-|          `show`           |      显示当前账户信息      |            `gotmail show`            |
-|        `show --id`        |      显示指定账户信息      |      `gotmail show --id abc123`      |
-|           `del`           |        删除当前账户        |            `gotmail del`             |
-|        `del --id`         |        删除指定账户        |      `gotmail del --id abc123`       |
-|      `export <path>`      | 导出所有账户数据到指定路径 | `gotmail export backup/account.json` |
-| `export <path> --id <id>` | 导出指定账户数据到指定路径 | `gotmail export backup/ --id abc123` |
-
 ## 🔧 开发指南
 
 ### 环境要求
 
 - Go 1.18 或更高版本
-- 网络连接（用于 Mail.tm API）
-- 支持的浏览器（用于打开邮件）
 
 ### 构建项目
 

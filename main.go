@@ -40,7 +40,7 @@ func main() {
 			log.Fatal("Error creating account:", err)
 		}
 
-	case "list":
+	case "ls":
 		if err := mailManager.ListAccounts(); err != nil {
 			log.Fatal("Error listing accounts:", err)
 		}
@@ -137,10 +137,10 @@ func main() {
 }
 
 func showHelp() {
-	fmt.Println("Mail.tm CLI Tool - Go Version")
+	fmt.Println("Your Temporary Email Accounts Manager")
 	fmt.Println("\nUsage:")
 	fmt.Println("  new                           Create a new account")
-	fmt.Println("  list                          List all accounts")
+	fmt.Println("  ls                            List all accounts")
 	fmt.Println("  msg [id <id>]                 Fetch and list messages")
 	fmt.Println("  del [id <id>]                 Delete account")
 	fmt.Println("  show [id <id>]                Show account details")
@@ -161,10 +161,10 @@ func showCommandHelp(command string) {
 		fmt.Println("  Creates a new temporary email account with a random address")
 		fmt.Println("  The account credentials will be stored locally for future use")
 
-	case "list":
+	case "ls":
 		fmt.Println("List all accounts")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail list")
+		fmt.Println("  gotmail ls")
 		fmt.Println("\nDescription:")
 		fmt.Println("  Displays all stored email accounts with their IDs and addresses")
 
@@ -231,7 +231,7 @@ func showCommandHelp(command string) {
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 		fmt.Println("\nAvailable commands:")
-		fmt.Println("  new, list, msg, del, show, open, export, help")
+		fmt.Println("  new, ls, msg, del, show, open, export, help")
 		fmt.Println("\nUse 'gotmail help <command>' for detailed help on a specific command")
 	}
 }

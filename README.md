@@ -95,7 +95,7 @@ gotmail open 1
 Export account data:
 
 ```bash
-gotmail export /backup/path/
+gotmail export /backup/folder/
 ```
 
 #### Multi-Account Operations
@@ -116,27 +116,27 @@ gotmail del --id abc123
 gotmail open 1 --id abc123
 
 # Export specific account data
-gotmail export ./backup --id abc123
+gotmail export ./backup/folder --id abc123
 ```
 
 ## 📖 Command Reference
 
-| Command                   | Description                                    | Example                              |
-| ------------------------- | ---------------------------------------------- | ------------------------------------ |
-| `new`                     | Create a new temporary email account           | `gotmail new`                        |
-| `ls`                      | List all accounts                              | `gotmail ls`                         |
-| `msg`                     | Fetch and list all emails                      | `gotmail msg`                        |
-| `msg --id <id>`           | Fetch emails for a specific account            | `gotmail msg --id abc123`            |
-| `open <number>`           | Open specified email in browser                | `gotmail open 1`                     |
-| `open <number> --id <id>` | Open specified email for specific account      | `gotmail open 1 --id abc123`         |
-| `show`                    | Display current account details                | `gotmail show`                       |
-| `show --id <id>`          | Display specific account details               | `gotmail show --id abc123`           |
-| `del`                     | Delete current account                         | `gotmail del`                        |
-| `del --id <id>`           | Delete specific account                        | `gotmail del --id abc123`            |
-| `export <path>`           | Export all account data to specified path      | `gotmail export backup/account.json` |
-| `export <path> --id <id>` | Export specific account data to specified path | `gotmail export backup/ --id abc123` |
-| `help`                    | Show help information                          | `gotmail help`                       |
-| `help <command>`          | Show detailed help for specific command        | `gotmail help msg`                   |
+| Command                     | Description                                      | Example                                    |
+| --------------------------- | ------------------------------------------------ | ------------------------------------------ |
+| `new`                       | Create a new temporary email account             | `gotmail new`                              |
+| `ls`                        | List all accounts                                | `gotmail ls`                               |
+| `msg`                       | Fetch and list all emails                        | `gotmail msg`                              |
+| `msg --id <id>`             | Fetch emails for a specific account              | `gotmail msg --id abc123`                  |
+| `open <number>`             | Open specified email in browser                  | `gotmail open 1`                           |
+| `open <number> --id <id>`   | Open specified email for specific account        | `gotmail open 1 --id abc123`               |
+| `show`                      | Display current account details                  | `gotmail show`                             |
+| `show --id <id>`            | Display specific account details                 | `gotmail show --id abc123`                 |
+| `del`                       | Delete current account                           | `gotmail del`                              |
+| `del --id <id>`             | Delete specific account                          | `gotmail del --id abc123`                  |
+| `export <folder>`           | Export all account data to specified folder      | `gotmail export backup/folder`             |
+| `export <folder> --id <id>` | Export specific account data to specified folder | `gotmail export backup/folder --id abc123` |
+| `help`                      | Show help information                            | `gotmail help`                             |
+| `help <command>`            | Show detailed help for specific command          | `gotmail help msg`                         |
 
 ## 🔧 Development Guide
 

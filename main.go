@@ -134,16 +134,16 @@ func main() {
 	case "export":
 		remainingArgs := fs.Args()
 		if len(remainingArgs) < 1 {
-			fmt.Println("Please provide export path")
+			fmt.Println("Please provide export folder")
 			return
 		}
-		exportPath := remainingArgs[0]
+		exportFolder := remainingArgs[0]
 		if hasAccountID {
-			if err := mailManager.ExportAccountByID(accountID, exportPath); err != nil {
+			if err := mailManager.ExportAccountByID(accountID, exportFolder); err != nil {
 				log.Fatal("Error exporting account:", err)
 			}
 		} else {
-			if err := mailManager.ExportAccount(exportPath); err != nil {
+			if err := mailManager.ExportAccount(exportFolder); err != nil {
 				log.Fatal("Error exporting account:", err)
 			}
 		}
@@ -170,7 +170,7 @@ func showHelp() {
 	fmt.Println("  del [--id <id>]               Delete account")
 	fmt.Println("  show [--id <id>]              Show account details")
 	fmt.Println("  open <number> [--id <id>]     Open specific email in browser")
-	fmt.Println("  export <path> [--id <id>]     Export account data to specified path")
+	fmt.Println("  export <folder> [--id <id>]   Export account data to specified folder")
 	fmt.Println("  help                          Show this help message")
 	fmt.Println("\nOptions:")
 	fmt.Println("  --id <id>                     Specify account ID for operations")
@@ -234,14 +234,14 @@ func showCommandHelp(command string) {
 		fmt.Println("  gotmail open 3 --id abc123     # Open third message from specific account")
 
 	case "export":
-		fmt.Println("Export account data to specified path")
+		fmt.Println("Export account data to specified folder")
 		fmt.Println("\nUsage:")
-		fmt.Println("  gotmail export <path> [--id <account_id>]")
+		fmt.Println("  gotmail export <folder> [--id <account_id>]")
 		fmt.Println("\nDescription:")
-		fmt.Println("  Exports account data to the specified file path")
+		fmt.Println("  Exports account data to the specified folder")
 		fmt.Println("\nExamples:")
-		fmt.Println("  gotmail export /tmp/backup.json          # Export default account")
-		fmt.Println("  gotmail export /tmp/backup.json --id abc123 # Export specific account")
+		fmt.Println("  gotmail export /tmp/backup          # Export default account")
+		fmt.Println("  gotmail export /tmp/backup --id abc123 # Export specific account")
 
 	case "help":
 		fmt.Println("Show help information")

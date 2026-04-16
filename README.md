@@ -185,7 +185,7 @@ This project uses the Mail.tm API to provide temporary email services:
 
 Account data is stored in a local file:
 
-- **File Path**: `<execution directory>/accounts.json`
+- **File Path**: `~/.gotmail.json`
 - **Data Format**: JSON
 - **Contains**: Multiple accounts with ID, email address, password, authentication token
 - **Backward Compatibility**: Automatically converts old single-account file formats

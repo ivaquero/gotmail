@@ -12,14 +12,14 @@ import (
 
 func main() {
 	// Get current executable directory
-	// Get current working directory
-	execDir, err := os.Getwd()
+	// Get user home directory
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal("Failed to get working directory:", err)
+		log.Fatal("Failed to get home directory:", err)
 	}
 
-	// Set data file path
-	dataPath := filepath.Join(execDir, "accounts.json")
+	// Set data file path to ~/.gotmail.json
+	dataPath := filepath.Join(homeDir, ".gotmail.json")
 
 	// Create mail manager
 	mailManager := utils.NewMailManager(dataPath)

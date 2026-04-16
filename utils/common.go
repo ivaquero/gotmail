@@ -301,7 +301,7 @@ func FormatAccountList(accounts map[string]*Account) string {
 	result.WriteString("Available accounts:\n")
 
 	for id, account := range accounts {
-		result.WriteString(fmt.Sprintf("  %s. %s (created: %s)\n",
+		result.WriteString(fmt.Sprintf("  %s %s (created: %s)\n",
 			color.Green(id),
 			color.Underline(account.Address),
 			account.CreatedAt.Format("2006-01-02 15:04:05")))

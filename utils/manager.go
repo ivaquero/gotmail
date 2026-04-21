@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -59,23 +61,23 @@ func (m *MailManager) CreateAccount() error {
 	password := GenerateRandomString(10)
 
 	// Create account
-	accountData, err := m.createAccountAPI(email, password)
+	accountID, err := m.createAccountAPI(email, password)
 	if err != nil {
 		return fmt.Errorf("failed to create account: %w", err)
 	}
 
 	// Get JWT token
-	tokenData, err := m.getToken(email, password)
+	token, err := m.getToken(email, password)
 	if err != nil {
 		return fmt.Errorf("failed to get token: %w", err)
 	}
 
 	// Build account information
 	account := &Account{
-		ID:        accountData["id"].(string),
+		ID:        accountID,
 		Address:   email,
 		Password:  password,
-		Token:     TokenData{Token: tokenData["token"].(string)},
+		Token:     TokenData{Token: token},
 		CreatedAt: time.Now(),
 	}
 
@@ -520,6 +522,10 @@ func (m *MailManager) getDomain() (string, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return "", buildAPIStatusError("get domain", resp)
+	}
+
 	var domainResp DomainResponse
 	if err := json.NewDecoder(resp.Body).Decode(&domainResp); err != nil {
 		return "", err
@@ -533,7 +539,7 @@ func (m *MailManager) getDomain() (string, error) {
 }
 
 // createAccountAPI calls API to create account
-func (m *MailManager) createAccountAPI(email, password string) (map[string]interface{}, error) {
+func (m *MailManager) createAccountAPI(email, password string) (string, error) {
 	payload := map[string]string{
 		"address":  email,
 		"password": password,
@@ -541,25 +547,35 @@ func (m *MailManager) createAccountAPI(email, password string) (map[string]inter
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	resp, err := m.client.Post("https://api.mail.tm/accounts", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
+	if resp.StatusCode != http.StatusCreated {
+		return "", buildAPIStatusError("create account", resp)
 	}
 
-	return result, nil
+	var result struct {
+		ID string `json:"id"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	if result.ID == "" {
+		return "", fmt.Errorf("create account response missing id")
+	}
+
+	return result.ID, nil
 }
 
 // getToken gets JWT token
-func (m *MailManager) getToken(email, password string) (map[string]interface{}, error) {
+func (m *MailManager) getToken(email, password string) (string, error) {
 	payload := map[string]string{
 		"address":  email,
 		"password": password,
@@ -567,21 +583,31 @@ func (m *MailManager) getToken(email, password string) (map[string]interface{}, 
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	resp, err := m.client.Post("https://api.mail.tm/token", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
+	if resp.StatusCode != http.StatusOK {
+		return "", buildAPIStatusError("get token", resp)
 	}
 
-	return result, nil
+	var result struct {
+		Token string `json:"token"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	if result.Token == "" {
+		return "", fmt.Errorf("token response missing token")
+	}
+
+	return result.Token, nil
 }
 
 // fetchMessagesAPI fetches email messages API
@@ -598,6 +624,10 @@ func (m *MailManager) fetchMessagesAPI(token string) ([]Message, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, buildAPIStatusError("fetch messages", resp)
+	}
 
 	var msgResp MessageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&msgResp); err != nil {
@@ -623,7 +653,7 @@ func (m *MailManager) deleteAccountAPI(accountID, token string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("failed to delete account, status: %d", resp.StatusCode)
+		return buildAPIStatusError("delete account", resp)
 	}
 
 	return nil
@@ -643,6 +673,10 @@ func (m *MailManager) getAccountDetailsAPI(accountID, token string) (map[string]
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, buildAPIStatusError("get account details", resp)
+	}
 
 	var result map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
@@ -666,6 +700,10 @@ func (m *MailManager) getEmailDetailAPI(messageID, token string) (*EmailDetail, 
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, buildAPIStatusError("get email detail", resp)
+	}
 
 	var result EmailDetail
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
@@ -702,4 +740,36 @@ func openInBrowser(filePath string) error {
 	}
 
 	return exec.Command(cmd, args...).Start()
+}
+
+func buildAPIStatusError(action string, resp *http.Response) error {
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 2048))
+	msg := extractAPIErrorMessage(body)
+	if msg == "" {
+		return fmt.Errorf("%s failed with status %d", action, resp.StatusCode)
+	}
+	return fmt.Errorf("%s failed with status %d: %s", action, resp.StatusCode, msg)
+}
+
+func extractAPIErrorMessage(body []byte) string {
+	trimmed := strings.TrimSpace(string(body))
+	if trimmed == "" {
+		return ""
+	}
+
+	var payload map[string]interface{}
+	if err := json.Unmarshal(body, &payload); err == nil {
+		for _, key := range []string{"message", "detail", "hydra:description", "title"} {
+			if raw, ok := payload[key]; ok {
+				if msg, ok := raw.(string); ok {
+					msg = strings.TrimSpace(msg)
+					if msg != "" {
+						return msg
+					}
+				}
+			}
+		}
+	}
+
+	return trimmed
 }

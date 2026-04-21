@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 
 	"github.com/ivaquero/gotmail/utils"
 )
@@ -29,18 +28,6 @@ func validateAccountID(accountID string) error {
 		return fmt.Errorf("account ID can only contain letters and numbers")
 	}
 	return nil
-}
-
-// validateEmailIndex validates email index input
-func validateEmailIndex(indexStr string) (int, error) {
-	index, err := strconv.Atoi(indexStr)
-	if err != nil {
-		return 0, fmt.Errorf("email index must be a valid number")
-	}
-	if index < 1 {
-		return 0, fmt.Errorf("email index must be greater than 0")
-	}
-	return index, nil
 }
 
 // validateExportPath validates export folder path
